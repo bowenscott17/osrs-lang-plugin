@@ -9,10 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.Plugin;
 import okhttp3.HttpUrl;
@@ -28,22 +26,35 @@ import com.osrslang.text.GameText;
 /**
  * An optional online translation provider.
  * <p>
- * This provider is disabled unless the user explicitly turns online translation on, and
+ * The provider is disabled unless the user explicitly turns online translation on, and
  * the config item that turns it on carries the warning RuneLite requires for any
  * feature that talks to a third-party server.
  * <p>
- * The default endpoint is a LibreTranslate-compatible API. Both LibreTranslate and
- * MyMemory speak a JSON dialect, so the same request and response handling works for
- * either; only the base URL and the source/target parameter names differ, and those
- * are handled by the request builder.
+ * Two service shapes are supported:
+ * <ul>
+ * <li><b>MyMemory</b> (the default) - free, no API key required, and works without
+ * any sign-up. The free anonymous tier is limited to 5,000 characters per day, so it
+ * suits occasional use rather than heavy translation.</li>
+ * <li><b>LibreTranslate</b> - a self-hosted or paid instance. The hosted
+ * {@code libretranslate.com} service requires a paid API key; a self-hosted instance
+ * needs none. This is the shape to use if the user runs their own service.</li>
+ * </ul>
+ * No API key is hard-coded anywhere. A key, if the user's service needs one, is read
+ * from the config and sent as a parameter.
  */
 @Slf4j
 public class OnlineTranslationProvider implements TranslationProvider
 {
 	/**
-	 * The default endpoint. LibreTranslate-compatible.
+	 * The free MyMemory endpoint. No key required.
 	 */
-	public static final String DEFAULT_ENDPOINT = "https://libretranslate.com";
+	public static final String MYMEMORY_ENDPOINT = "https://api.mymemory.translated.net";
+
+	/**
+	 * A LibreTranslate instance. The hosted one requires a paid key; a self-hosted one
+	 * does not.
+	 */
+	public static final String LIBRETRANSLATE_ENDPOINT = "https://libretranslate.com";
 
 	/**
 	 * How many requests may be made per minute.
@@ -51,17 +62,52 @@ public class OnlineTranslationProvider implements TranslationProvider
 	private static final int RATE_LIMIT_PER_MINUTE = 20;
 
 	/**
-	 * How long to wait before a request is considered failed.
+	 * The online service to use.
 	 */
-	private static final int TIMEOUT_SECONDS = 15;
+	public enum Service
+	{
+		MYMEMORY("MyMemory (free, no key)"),
+		LIBRETRANSLATE("LibreTranslate");
+
+		private final String displayName;
+
+		Service(String displayName)
+		{
+			this.displayName = displayName;
+		}
+
+		public String getDisplayName()
+		{
+			return displayName;
+		}
+
+		public String getCode()
+		{
+			return name().toLowerCase(java.util.Locale.ROOT);
+		}
+
+		public static Service fromCode(String code)
+		{
+			if (code != null)
+			{
+				for (Service service : values())
+				{
+					if (service.getCode().equalsIgnoreCase(code.trim()))
+					{
+						return service;
+					}
+				}
+			}
+			return MYMEMORY;
+		}
+	}
 
 	private final Plugin plugin;
 	private final OkHttpClient httpClient;
 	private final Gson gson;
-	private final ScheduledExecutorService scheduler;
 
 	/**
-	 * Requests made in the current window, used for rate limiting.
+	 * Requests made in the current rate-limit window.
 	 */
 	private final AtomicInteger requestsThisWindow = new AtomicInteger();
 
@@ -81,16 +127,25 @@ public class OnlineTranslationProvider implements TranslationProvider
 	private volatile boolean enabled;
 
 	/**
-	 * The endpoint to use. May be changed by the config.
+	 * Which service to use.
 	 */
-	private volatile String endpoint = DEFAULT_ENDPOINT;
+	private volatile Service service = Service.MYMEMORY;
 
-	public OnlineTranslationProvider(Plugin plugin, OkHttpClient httpClient, Gson gson, ScheduledExecutorService scheduler)
+	/**
+	 * The endpoint of the chosen service.
+	 */
+	private volatile String endpoint = MYMEMORY_ENDPOINT;
+
+	/**
+	 * An API key, if the user's service needs one. Never hard-coded.
+	 */
+	private volatile String apiKey = "";
+
+	public OnlineTranslationProvider(Plugin plugin, OkHttpClient httpClient, Gson gson)
 	{
 		this.plugin = plugin;
 		this.httpClient = httpClient;
 		this.gson = gson;
-		this.scheduler = scheduler;
 	}
 
 	/**
@@ -102,11 +157,32 @@ public class OnlineTranslationProvider implements TranslationProvider
 	}
 
 	/**
-	 * Sets the endpoint to use.
+	 * Chooses which service to use.
+	 */
+	public void setService(Service service)
+	{
+		this.service = service;
+		this.endpoint = service == Service.MYMEMORY ? MYMEMORY_ENDPOINT : LIBRETRANSLATE_ENDPOINT;
+	}
+
+	public Service getService()
+	{
+		return service;
+	}
+
+	/**
+	 * Overrides the endpoint, for a self-hosted instance.
 	 */
 	public void setEndpoint(String endpoint)
 	{
-		this.endpoint = endpoint == null || endpoint.trim().isEmpty() ? DEFAULT_ENDPOINT : endpoint.trim();
+		if (endpoint == null || endpoint.trim().isEmpty())
+		{
+			this.endpoint = service == Service.MYMEMORY ? MYMEMORY_ENDPOINT : LIBRETRANSLATE_ENDPOINT;
+		}
+		else
+		{
+			this.endpoint = endpoint.trim();
+		}
 	}
 
 	public String getEndpoint()
@@ -114,10 +190,18 @@ public class OnlineTranslationProvider implements TranslationProvider
 		return endpoint;
 	}
 
+	/**
+	 * Sets the API key for services that need one.
+	 */
+	public void setApiKey(String apiKey)
+	{
+		this.apiKey = apiKey == null ? "" : apiKey.trim();
+	}
+
 	@Override
 	public String getName()
 	{
-		return "Online translation";
+		return "Online translation (" + service.getDisplayName() + ")";
 	}
 
 	@Override
@@ -175,24 +259,14 @@ public class OnlineTranslationProvider implements TranslationProvider
 		if (!reserveRequestSlot())
 		{
 			inFlight.remove(key);
+			log.debug("Online translation rate limit reached, skipping '{}'", text);
 			promise.complete(Optional.empty());
 			return;
 		}
 
-		// The query string carries the text, which keeps the request compatible with
-		// every LibreTranslate-compatible endpoint without needing a JSON body.
-		HttpUrl url = HttpUrl.parse(endpoint + "/translate")
-			.newBuilder()
-			.addQueryParameter("q", text)
-			.addQueryParameter("source", from.getCode())
-			.addQueryParameter("target", to.getCode())
-			.addQueryParameter("format", "text")
-			.build();
-
-		Request request = new Request.Builder()
-			.url(url)
-			.get()
-			.build();
+		Request request = service == Service.MYMEMORY
+			? buildMyMemoryRequest(text, from, to)
+			: buildLibreTranslateRequest(text, from, to);
 
 		httpClient.newCall(request).enqueue(new okhttp3.Callback()
 		{
@@ -211,18 +285,19 @@ public class OnlineTranslationProvider implements TranslationProvider
 				{
 					if (!response.isSuccessful() || body == null)
 					{
+						inFlight.remove(key);
 						log.debug("Online translation returned HTTP {}", response.code());
 						promise.complete(Optional.empty());
 						return;
 					}
 
-					String json = body.string();
-					Optional<TranslationResult> result = parseResponse(json, text, to);
+					Optional<TranslationResult> result = parseResponse(body.string(), text, to);
 
 					promise.complete(result);
 				}
 				catch (IOException | RuntimeException e)
 				{
+					inFlight.remove(key);
 					log.debug("Failed to read online translation response", e);
 					promise.complete(Optional.empty());
 				}
@@ -235,9 +310,48 @@ public class OnlineTranslationProvider implements TranslationProvider
 	}
 
 	/**
-	 * Parses a LibreTranslate-compatible response.
+	 * Builds a MyMemory request. MyMemory uses {@code langpair} and answers with
+	 * {@code responseData.translatedText}.
 	 */
-	private Optional<TranslationResult> parseResponse(String json, String source, Language to)
+	private Request buildMyMemoryRequest(String text, Language from, Language to)
+	{
+		HttpUrl.Builder url = HttpUrl.parse(endpoint + "/get")
+			.newBuilder()
+			.addQueryParameter("q", text)
+			.addQueryParameter("langpair", from.getCode() + "|" + to.getCode());
+
+		if (!apiKey.isEmpty())
+		{
+			url.addQueryParameter("key", apiKey);
+		}
+
+		return new Request.Builder().url(url.build()).get().build();
+	}
+
+	/**
+	 * Builds a LibreTranslate request.
+	 */
+	private Request buildLibreTranslateRequest(String text, Language from, Language to)
+	{
+		HttpUrl.Builder url = HttpUrl.parse(endpoint + "/translate")
+			.newBuilder()
+			.addQueryParameter("q", text)
+			.addQueryParameter("source", from.getCode())
+			.addQueryParameter("target", to.getCode())
+			.addQueryParameter("format", "text");
+
+		if (!apiKey.isEmpty())
+		{
+			url.addQueryParameter("api_key", apiKey);
+		}
+
+		return new Request.Builder().url(url.build()).get().build();
+	}
+
+	/**
+	 * Parses the response, handling both service shapes.
+	 */
+	Optional<TranslationResult> parseResponse(String json, String source, Language to)
 	{
 		try
 		{
@@ -255,12 +369,26 @@ public class OnlineTranslationProvider implements TranslationProvider
 				return Optional.empty();
 			}
 
-			if (!object.has("translatedText"))
+			String translated = null;
+
+			if (object.has("responseData"))
 			{
-				return Optional.empty();
+				// MyMemory shape.
+				JsonElement responseData = object.get("responseData");
+				if (responseData.isJsonObject() && responseData.getAsJsonObject().has("translatedText"))
+				{
+					translated = responseData.getAsJsonObject().get("translatedText").getAsString();
+				}
+			}
+			else if (object.has("translatedText"))
+			{
+				translated = object.get("translatedText").getAsString();
+			}
+			else if (object.has("translated_text"))
+			{
+				translated = object.get("translated_text").getAsString();
 			}
 
-			String translated = object.get("translatedText").getAsString();
 			if (translated == null || translated.trim().isEmpty())
 			{
 				return Optional.empty();
@@ -286,7 +414,7 @@ public class OnlineTranslationProvider implements TranslationProvider
 
 		if (now >= windowEndsAt)
 		{
-			windowEndsAt = now + TimeUnit.MINUTES.toMillis(1);
+			windowEndsAt = now + java.util.concurrent.TimeUnit.MINUTES.toMillis(1);
 			requestsThisWindow.set(0);
 		}
 

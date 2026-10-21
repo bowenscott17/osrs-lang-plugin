@@ -152,7 +152,7 @@ public interface OsrsLangConfig extends Config
 	@ConfigItem(
 		keyName = "offlineTranslationEnabled",
 		name = "Use offline translation",
-		description = "Use the bundled offline machine translation engine when no verified or dictionary entry is available",
+		description = "Use a LibreTranslate service running on your own machine when no verified or dictionary entry is available. Nothing leaves your computer.",
 		position = 21,
 		section = engineSection
 	)
@@ -162,10 +162,22 @@ public interface OsrsLangConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "offlineTranslationEndpoint",
+		name = "Offline translation address",
+		description = "The address of your local LibreTranslate service. Install it with 'pip install libretranslate' and run 'libretranslate' to use the default.",
+		position = 22,
+		section = engineSection
+	)
+	default String offlineTranslationEndpoint()
+	{
+		return "http://127.0.0.1:5000";
+	}
+
+	@ConfigItem(
 		keyName = "onlineTranslationEnabled",
 		name = "Use online translation",
 		description = "Fall back to an online translation service when no other source has a translation. Game text is sent to the service.",
-		position = 22,
+		position = 23,
 		section = engineSection,
 		warning = "This feature submits your IP address to a 3rd-party server not controlled or verified by RuneLite developers"
 	)
@@ -175,15 +187,39 @@ public interface OsrsLangConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "onlineTranslationService",
+		name = "Online translation service",
+		description = "MyMemory is free and needs no account. LibreTranslate needs a self-hosted instance or a paid key.",
+		position = 24,
+		section = engineSection
+	)
+	default String onlineTranslationService()
+	{
+		return "mymemory";
+	}
+
+	@ConfigItem(
 		keyName = "onlineTranslationEndpoint",
-		name = "Online translation endpoint",
-		description = "The URL of the LibreTranslate-compatible service to use",
-		position = 23,
+		name = "Online translation address",
+		description = "Override the service address. Leave empty to use the default for the chosen service.",
+		position = 25,
 		section = engineSection
 	)
 	default String onlineTranslationEndpoint()
 	{
-		return "https://libretranslate.com";
+		return "";
+	}
+
+	@ConfigItem(
+		keyName = "onlineTranslationApiKey",
+		name = "Online translation API key",
+		description = "Only needed for a paid or self-hosted service that requires one. Leave empty for MyMemory.",
+		position = 26,
+		section = engineSection
+	)
+	default String onlineTranslationApiKey()
+	{
+		return "";
 	}
 
 	@ConfigSection(
