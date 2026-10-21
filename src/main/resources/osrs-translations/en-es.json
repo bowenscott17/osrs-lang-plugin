@@ -1,0 +1,220 @@
+{
+  "entries": [
+    {
+      "text": "Could you bring me a bucket of water?",
+      "translation": "¿Puedes traerme un balde de agua?",
+      "category": "sentence",
+      "id": "sentence.bucket-of-water"
+    },
+    {
+      "text": "Hello, how are you?",
+      "translation": "Hola, ¿cómo estás?",
+      "category": "sentence",
+      "id": "sentence.hello-how-are-you"
+    },
+    {
+      "text": "How are you?",
+      "translation": "¿Cómo estás?",
+      "category": "sentence",
+      "id": "sentence.how-are-you"
+    },
+    {
+      "text": "What do you want?",
+      "translation": "¿Qué quieres?",
+      "category": "sentence",
+      "id": "sentence.what-do-you-want"
+    },
+    {
+      "text": "Do you have any...?",
+      "translation": "¿Tienes alguno...?",
+      "category": "sentence",
+      "id": "sentence.do-you-have-any"
+    },
+    {
+      "text": "Thank you very much.",
+      "translation": "Muchas gracias.",
+      "category": "sentence",
+      "id": "sentence.thank-you-very-much"
+    },
+    {
+      "text": "You are welcome.",
+      "translation": "De nada.",
+      "category": "sentence",
+      "id": "sentence.you-are-welcome"
+    },
+    {
+      "text": "Please wait a moment.",
+      "translation": "Espera un momento, por favor.",
+      "category": "sentence",
+      "id": "sentence.please-wait"
+    },
+    {
+      "text": "Come back later.",
+      "translation": "Vuelve más tarde.",
+      "category": "sentence",
+      "id": "sentence.come-back-later"
+    },
+    {
+      "text": "Kill the dragon!",
+      "translation": "¡Mata al dragón!",
+      "category": "sentence",
+      "id": "sentence.kill-the-dragon"
+    },
+    {
+      "text": "Bucket",
+      "translation": "Balde",
+      "category": "item",
+      "id": "item.bucket"
+    },
+    {
+      "text": "Water",
+      "translation": "Agua",
+      "category": "item",
+      "id": "item.water"
+    },
+    {
+      "text": "Bread",
+      "translation": "Pan",
+      "category": "item",
+      "id": "item.bread"
+    },
+    {
+      "text": "Bronze sword",
+      "translation": "Espada de bronce",
+      "category": "item",
+      "id": "item.bronze_sword"
+    },
+    {
+      "text": "Iron sword",
+      "translation": "Espada de hierro",
+      "category": "item",
+      "id": "item.iron_sword"
+    },
+    {
+      "text": "Wooden shield",
+      "translation": "Escudo de madera",
+      "category": "item",
+      "id": "item.wooden_shield"
+    },
+    {
+      "text": "Coal",
+      "translation": "Carbón",
+      "category": "item",
+      "id": "item.coal"
+    },
+    {
+      "text": "Bronze ore",
+      "translation": "Mineral de bronce",
+      "category": "item",
+      "id": "item.bronze_ore"
+    },
+    {
+      "text": "Iron ore",
+      "translation": "Mineral de hierro",
+      "category": "item",
+      "id": "item.iron_ore"
+    },
+    {
+      "text": "Abyssal whip",
+      "translation": "Látigo abisal",
+      "category": "item",
+      "id": "item.abyssal_whip"
+    },
+    {
+      "text": "A bucket of water",
+      "translation": "Un balde de agua",
+      "category": "item-description",
+      "id": "item-desc.bucket_of_water"
+    },
+    {
+      "text": "A coil of rope",
+      "translation": "Una cuerda",
+      "category": "item-description",
+      "id": "item-desc.coil_of_rope"
+    },
+    {
+      "text": "Rune",
+      "translation": "Runa",
+      "category": "term",
+      "id": "term.rune"
+    },
+    {
+      "text": "Runes",
+      "translation": "Runas",
+      "category": "term",
+      "id": "term.runes"
+    },
+    {
+      "text": "Attack",
+      "translation": "Ataque",
+      "category": "skill",
+      "id": "skill.attack"
+    },
+    {
+      "text": "Strength",
+      "translation": "Fuerza",
+      "category": "skill",
+      "id": "skill.strength"
+    },
+    {
+      "text": "Defence",
+      "translation": "Defensa",
+      "category": "skill",
+      "id": "skill.defence"
+    },
+    {
+      "text": "Magic",
+      "translation": "Magia",
+      "category": "skill",
+      "id": "skill.magic"
+    },
+    {
+      "text": "Woodcutting",
+      "translation": "Tala",
+      "category": "skill",
+      "id": "skill.woodcutting"
+    },
+    {
+      "text": "Mining",
+      "translation": "Minería",
+      "category": "skill",
+      "id": "skill.mining"
+    },
+    {
+      "text": "Fishing",
+      "translation": "Pesca",
+      "category": "skill",
+      "id": "skill.fishing"
+    },
+    {
+      "text": "Cooking",
+      "translation": "Cocina",
+      "category": "skill",
+      "id": "skill.cooking"
+    },
+    {
+      "text": "Firemaking",
+      "translation": "Fabricación de fuego",
+      "category": "skill",
+      "id": "skill.firemaking"
+    },
+    {
+      "text": "Smithing",
+      "translation": "Fundición",
+      "category": "skill",
+      "id": "skill.smithing"
+    },
+    {
+      "text": "The Resting Fist",
+      "translation": "El Puño en Reposo",
+      "category": "quest",
+      "id": "quest.the_resting_fist"
+    },
+    {
+      "text": "Wolves' Fen",
+      "translation": "La Mina de los Lobos",
+      "category": "quest",
+      "id": "quest.wolves_fen"
+    }
+  ]
+}

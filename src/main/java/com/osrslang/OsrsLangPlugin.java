@@ -7,16 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import java.io.IOException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
+import net.runelite.client.util.ExecutorServiceExceptionLogger;
 import net.runelite.client.util.Filepath;
 import okhttp3.OkHttpClient;
 import com.osrslang.overlay.TranslationOverlay;
@@ -28,6 +31,7 @@ import com.osrslang.translation.Language;
 import com.osrslang.translation.TranslationManager;
 import com.osrslang.translation.TranslationService;
 import com.osrslang.translation.provider.LocalDictionaryProvider;
+import com.osrslang.translation.provider.OfflineMachineTranslationProvider;
 import com.osrslang.translation.provider.OnlineTranslationProvider;
 import com.osrslang.translation.provider.OsrsTranslationDatabaseProvider;
 
@@ -62,13 +66,20 @@ public class OsrsLangPlugin extends Plugin
 	private OkHttpClient httpClient;
 
 	@Inject
-	private ScheduledExecutorService scheduler;
+	private ClientThread clientThread;
+
+	/**
+	 * The pool translation work runs on. Wrapped so uncaught exceptions are logged
+	 * rather than silently killing a thread.
+	 */
+	private ScheduledExecutorService translationExecutor;
 
 	private TranslationOverlay overlay;
 	private WordTooltipOverlay wordOverlay;
 	private TranslationService translationService;
 	private TranslationManager translationManager;
 	private OnlineTranslationProvider onlineProvider;
+	private OfflineMachineTranslationProvider offlineProvider;
 	private JsonTranslationCache translationCache;
 
 	/**
@@ -96,17 +107,33 @@ public class OsrsLangPlugin extends Plugin
 		translationManager.register(database);
 		translationManager.register(dictionary);
 
+		// The offline engine talks to a LibreTranslate service the user runs on their
+		// own machine, so no game text leaves the computer.
+		offlineProvider = new OfflineMachineTranslationProvider(this, httpClient, gson);
+		offlineProvider.setEnabled(config.offlineTranslationEnabled());
+		offlineProvider.setEndpoint(config.offlineTranslationEndpoint());
+		translationManager.registerFallback(offlineProvider);
+
 		// The online provider is a fallback, and is only ever consulted when the user
 		// has explicitly enabled it.
-		onlineProvider = new OnlineTranslationProvider(this, httpClient, gson, scheduler);
+		onlineProvider = new OnlineTranslationProvider(this, httpClient, gson);
 		onlineProvider.setEnabled(config.onlineTranslationEnabled());
+		onlineProvider.setService(OnlineTranslationProvider.Service.fromCode(config.onlineTranslationService()));
 		onlineProvider.setEndpoint(config.onlineTranslationEndpoint());
+		onlineProvider.setApiKey(config.onlineTranslationApiKey());
 		translationManager.registerFallback(onlineProvider);
 
 		wordOverlay = new WordTooltipOverlay(client, tooltipManager, translationManager, from, to);
 		overlayManager.add(wordOverlay);
 
-		translationService = new TranslationService(translationManager);
+		translationExecutor = new ExecutorServiceExceptionLogger(
+			Executors.newScheduledThreadPool(2, r -> {
+				Thread thread = new Thread(r, "osrs-lang-translate");
+				thread.setDaemon(true);
+				return thread;
+			}));
+
+		translationService = new TranslationService(translationManager, translationExecutor);
 
 		setUpCache();
 
@@ -139,6 +166,16 @@ public class OsrsLangPlugin extends Plugin
 		{
 			onlineProvider.shutdown();
 			onlineProvider = null;
+		}
+		if (offlineProvider != null)
+		{
+			offlineProvider.shutdown();
+			offlineProvider = null;
+		}
+		if (translationExecutor != null)
+		{
+			translationExecutor.shutdownNow();
+			translationExecutor = null;
 		}
 		if (translationCache != null)
 		{
@@ -205,9 +242,30 @@ public class OsrsLangPlugin extends Plugin
 			{
 				onlineProvider.setEnabled(config.onlineTranslationEnabled());
 			}
+			else if ("onlineTranslationService".equals(event.getKey()))
+			{
+				onlineProvider.setService(OnlineTranslationProvider.Service.fromCode(config.onlineTranslationService()));
+				onlineProvider.setEndpoint(config.onlineTranslationEndpoint());
+			}
 			else if ("onlineTranslationEndpoint".equals(event.getKey()))
 			{
 				onlineProvider.setEndpoint(config.onlineTranslationEndpoint());
+			}
+			else if ("onlineTranslationApiKey".equals(event.getKey()))
+			{
+				onlineProvider.setApiKey(config.onlineTranslationApiKey());
+			}
+		}
+
+		if (offlineProvider != null)
+		{
+			if ("offlineTranslationEnabled".equals(event.getKey()))
+			{
+				offlineProvider.setEnabled(config.offlineTranslationEnabled());
+			}
+			else if ("offlineTranslationEndpoint".equals(event.getKey()))
+			{
+				offlineProvider.setEndpoint(config.offlineTranslationEndpoint());
 			}
 		}
 
@@ -275,10 +333,19 @@ public class OsrsLangPlugin extends Plugin
 			translationService.request(original, from, to, dialogue.getType())
 				.thenAccept(result -> result.ifPresent(translation ->
 				{
-					// The result arrives on a background thread; only record it here and
-					// let the client thread pick it up on the next tick.
-					currentTranslation = translation.getTranslatedText();
-					currentSourceLabel = translation.getSourceLabel();
+					// The result arrives on a background thread. Hop to the client
+					// thread before touching the fields the overlay reads, so the
+					// overlay never sees a half-written translation.
+					clientThread.invoke(() ->
+					{
+						// Only apply the result if the dialogue has not changed in the
+						// meantime; a slow translation of old text is not wanted.
+						if (original.equals(currentOriginal))
+						{
+							currentTranslation = translation.getTranslatedText();
+							currentSourceLabel = translation.getSourceLabel();
+						}
+					});
 				}));
 		}
 
