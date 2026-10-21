@@ -1,0 +1,238 @@
+{
+  "entries": [
+    {
+      "text": "Could you bring me a bucket of water?",
+      "translation": "Kannst du mir einen Eimer Wasser bringen?",
+      "category": "sentence",
+      "id": "sentence.bucket-of-water"
+    },
+    {
+      "text": "Hello, how are you?",
+      "translation": "Hallo, wie geht es dir?",
+      "category": "sentence",
+      "id": "sentence.hello-how-are-you"
+    },
+    {
+      "text": "How are you?",
+      "translation": "Wie geht es dir?",
+      "category": "sentence",
+      "id": "sentence.how-are-you"
+    },
+    {
+      "text": "What do you want?",
+      "translation": "Was möchtest du?",
+      "category": "sentence",
+      "id": "sentence.what-do-you-want"
+    },
+    {
+      "text": "Do you have any...?",
+      "translation": "Hast du irgendeine...?",
+      "category": "sentence",
+      "id": "sentence.do-you-have-any"
+    },
+    {
+      "text": "Thank you very much.",
+      "translation": "Vielen Dank.",
+      "category": "sentence",
+      "id": "sentence.thank-you-very-much"
+    },
+    {
+      "text": "You are welcome.",
+      "translation": "Gern geschehen.",
+      "category": "sentence",
+      "id": "sentence.you-are-welcome"
+    },
+    {
+      "text": "Please wait a moment.",
+      "translation": "Bitte warte einen Moment.",
+      "category": "sentence",
+      "id": "sentence.please-wait"
+    },
+    {
+      "text": "Come back later.",
+      "translation": "Komm später wieder.",
+      "category": "sentence",
+      "id": "sentence.come-back-later"
+    },
+    {
+      "text": "Kill the dragon!",
+      "translation": "Töte den Drachen!",
+      "category": "sentence",
+      "id": "sentence.kill-the-dragon"
+    },
+    {
+      "text": "Attack me and I'll run you through.",
+      "translation": "Greif mich an und ich durchbohre dich.",
+      "category": "sentence",
+      "id": "sentence.attack-me"
+    },
+    {
+      "text": "Bucket",
+      "translation": "Eimer",
+      "category": "item",
+      "id": "item.bucket"
+    },
+    {
+      "text": "Water",
+      "translation": "Wasser",
+      "category": "item",
+      "id": "item.water"
+    },
+    {
+      "text": "Bread",
+      "translation": "Brot",
+      "category": "item",
+      "id": "item.bread"
+    },
+    {
+      "text": "Bronze sword",
+      "translation": "Bronzeschwert",
+      "category": "item",
+      "id": "item.bronze_sword"
+    },
+    {
+      "text": "Iron sword",
+      "translation": "Eisenschwert",
+      "category": "item",
+      "id": "item.iron_sword"
+    },
+    {
+      "text": "Wooden shield",
+      "translation": "Holzschild",
+      "category": "item",
+      "id": "item.wooden_shield"
+    },
+    {
+      "text": "Coal",
+      "translation": "Kohle",
+      "category": "item",
+      "id": "item.coal"
+    },
+    {
+      "text": "Bronze ore",
+      "translation": "Bronzeerz",
+      "category": "item",
+      "id": "item.bronze_ore"
+    },
+    {
+      "text": "Iron ore",
+      "translation": "Eisenerz",
+      "category": "item",
+      "id": "item.iron_ore"
+    },
+    {
+      "text": "Abyssal whip",
+      "translation": "Abyssal-Geißel",
+      "category": "item",
+      "id": "item.abyssal_whip"
+    },
+    {
+      "text": "A bucket of water",
+      "translation": "Ein Eimer Wasser",
+      "category": "item-description",
+      "id": "item-desc.bucket_of_water"
+    },
+    {
+      "text": "A coil of rope",
+      "translation": "Ein Seil",
+      "category": "item-description",
+      "id": "item-desc.coil_of_rope"
+    },
+    {
+      "text": "Coal",
+      "translation": "Kohle",
+      "category": "term",
+      "id": "term.coal"
+    },
+    {
+      "text": "Rune",
+      "translation": "Rune",
+      "category": "term",
+      "id": "term.rune"
+    },
+    {
+      "text": "Runes",
+      "translation": "Runen",
+      "category": "term",
+      "id": "term.runes"
+    },
+    {
+      "text": "Attack",
+      "translation": "Angreifen",
+      "category": "skill",
+      "id": "skill.attack"
+    },
+    {
+      "text": "Strength",
+      "translation": "Stärke",
+      "category": "skill",
+      "id": "skill.strength"
+    },
+    {
+      "text": "Defence",
+      "translation": "Verteidigung",
+      "category": "skill",
+      "id": "skill.defence"
+    },
+    {
+      "text": "Magic",
+      "translation": "Magie",
+      "category": "skill",
+      "id": "skill.magic"
+    },
+    {
+      "text": "Woodcutting",
+      "translation": "Holzfällung",
+      "category": "skill",
+      "id": "skill.woodcutting"
+    },
+    {
+      "text": "Mining",
+      "translation": "Bergbau",
+      "category": "skill",
+      "id": "skill.mining"
+    },
+    {
+      "text": "Fishing",
+      "translation": "Angeln",
+      "category": "skill",
+      "id": "skill.fishing"
+    },
+    {
+      "text": "Cooking",
+      "translation": "Kochen",
+      "category": "skill",
+      "id": "skill.cooking"
+    },
+    {
+      "text": "Firemaking",
+      "translation": "Feuerherstellung",
+      "category": "skill",
+      "id": "skill.firemaking"
+    },
+    {
+      "text": "Smithing",
+      "translation": "Schmiedekunst",
+      "category": "skill",
+      "id": "skill.smithing"
+    },
+    {
+      "text": "The Resting Fist",
+      "translation": "Die ruhende Faust",
+      "category": "quest",
+      "id": "quest.the_resting_fist"
+    },
+    {
+      "text": "Wolves' Fen",
+      "translation": "Wolfsschlucht",
+      "category": "quest",
+      "id": "quest.wolves_fen"
+    },
+    {
+      "text": "Cooking",
+      "translation": "Kochen",
+      "category": "activity",
+      "id": "activity.cooking"
+    }
+  ]
+}
