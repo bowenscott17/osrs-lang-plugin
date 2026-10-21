@@ -1,0 +1,364 @@
+{
+  "bucket": {
+    "translation": "der Eimer",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Eimer",
+    "gender": "der",
+    "example": "Kannst du mir einen Eimer Wasser bringen?",
+    "english": "bucket"
+  },
+  "water": {
+    "translation": "das Wasser",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Wasser",
+    "gender": "das",
+    "example": "Der Eimer ist voller Wasser.",
+    "english": "water"
+  },
+  "sword": {
+    "translation": "das Schwert",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Schwert",
+    "gender": "das",
+    "example": "Ich brauche ein Schwert.",
+    "english": "sword"
+  },
+  "shield": {
+    "translation": "der Schild",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Schild",
+    "gender": "der",
+    "example": "Der Schild schützt dich im Kampf.",
+    "english": "shield"
+  },
+  "axe": {
+    "translation": "die Axt",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Axt",
+    "gender": "die",
+    "example": "Er trägt eine Axt am Gürtel.",
+    "english": "axe"
+  },
+  "pickaxe": {
+    "translation": "die Spitzhacke",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Spitzhacke",
+    "gender": "die",
+    "example": "Die Spitzhacke bricht im Felsen.",
+    "english": "pickaxe"
+  },
+  "hammer": {
+    "translation": "der Hammer",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Hammer",
+    "gender": "der",
+    "example": "Der Hammer ist schwer.",
+    "english": "hammer"
+  },
+  "bread": {
+    "translation": "das Brot",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Brot",
+    "gender": "das",
+    "example": "Ich habe ein Stück Brot.",
+    "english": "bread"
+  },
+  "cheese": {
+    "translation": "der Käse",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Käse",
+    "gender": "der",
+    "example": "Sie mag Käse.",
+    "english": "cheese"
+  },
+  "fish": {
+    "translation": "der Fisch",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Fisch",
+    "gender": "der",
+    "example": "Der Fisch ist frisch.",
+    "english": "fish"
+  },
+  "chicken": {
+    "translation": "das Huhn",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Huhn",
+    "gender": "das",
+    "example": "Das Huhn legt Eier.",
+    "english": "chicken"
+  },
+  "coins": {
+    "translation": "die Münzen",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Münze",
+    "gender": "die",
+    "example": "Ich brauche Münzen.",
+    "english": "coins"
+  },
+  "gold": {
+    "translation": "das Gold",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Gold",
+    "gender": "das",
+    "example": "Das Gold ist schwer.",
+    "english": "gold"
+  },
+  "iron": {
+    "translation": "das Eisen",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Eisen",
+    "gender": "das",
+    "example": "Das Eisen ist hart.",
+    "english": "iron"
+  },
+  "ore": {
+    "translation": "das Erz",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Erz",
+    "gender": "das",
+    "example": "Ich suche nach Erz.",
+    "english": "ore"
+  },
+  "fire": {
+    "translation": "das Feuer",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Feuer",
+    "gender": "das",
+    "example": "Das Feuer brennt hell.",
+    "english": "fire"
+  },
+  "wood": {
+    "translation": "das Holz",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Holz",
+    "gender": "das",
+    "example": "Das Holz ist trocken.",
+    "english": "wood"
+  },
+  "rope": {
+    "translation": "das Seil",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Seil",
+    "gender": "das",
+    "example": "Das Seil ist lang.",
+    "english": "rope"
+  },
+  "spell": {
+    "translation": "der Zauber",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Zauber",
+    "gender": "der",
+    "example": "Der Zauber wirkt stark.",
+    "english": "spell"
+  },
+  "quest": {
+    "translation": "die Quest",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Quest",
+    "gender": "die",
+    "example": "Die Quest ist lang.",
+    "english": "quest"
+  },
+  "shop": {
+    "translation": "der Laden",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Laden",
+    "gender": "der",
+    "example": "Der Laden öffnet um acht.",
+    "english": "shop"
+  },
+  "bank": {
+    "translation": "die Bank",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Bank",
+    "gender": "die",
+    "example": "Die Bank ist sicher.",
+    "english": "bank"
+  },
+  "friend": {
+    "translation": "der Freund",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Freund",
+    "gender": "der",
+    "example": "Mein Freund hilft mir.",
+    "english": "friend"
+  },
+  "master": {
+    "translation": "der Meister",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Meister",
+    "gender": "der",
+    "example": "Der Meister lehrt mich.",
+    "english": "master"
+  },
+  "help": {
+    "translation": "die Hilfe",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Hilfe",
+    "gender": "die",
+    "example": "Ich brauche Hilfe.",
+    "english": "help"
+  },
+  "please": {
+    "translation": "bitte",
+    "partOfSpeech": "adverb",
+    "dictionaryForm": "bitte",
+    "example": "Einen Eimer Wasser, bitte.",
+    "english": "please"
+  },
+  "yes": {
+    "translation": "ja",
+    "partOfSpeech": "adverb",
+    "dictionaryForm": "ja",
+    "example": "Ja, das stimmt.",
+    "english": "yes"
+  },
+  "no": {
+    "translation": "nein",
+    "partOfSpeech": "adverb",
+    "dictionaryForm": "nein",
+    "example": "Nein, danke.",
+    "english": "no"
+  },
+  "hello": {
+    "translation": "hallo",
+    "partOfSpeech": "interjection",
+    "dictionaryForm": "hallo",
+    "example": "Hallo, wie geht es dir?",
+    "english": "hello"
+  },
+  "goodbye": {
+    "translation": "auf Wiedersehen",
+    "partOfSpeech": "interjection",
+    "dictionaryForm": "auf Wiedersehen",
+    "example": "Auf Wiedersehen bis morgen.",
+    "english": "goodbye"
+  },
+  "thanks": {
+    "translation": "danke",
+    "partOfSpeech": "interjection",
+    "dictionaryForm": "danke",
+    "example": "Danke für deine Hilfe.",
+    "english": "thanks"
+  },
+  "sorry": {
+    "translation": "entschuldigung",
+    "partOfSpeech": "noun",
+    "dictionaryForm": "Entschuldigung",
+    "gender": "die",
+    "example": "Entschuldigung, ich war es nicht.",
+    "english": "sorry"
+  },
+  "come": {
+    "translation": "kommen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "kommen",
+    "example": "Komm bitte her.",
+    "english": "come"
+  },
+  "go": {
+    "translation": "gehen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "gehen",
+    "example": "Ich muss gehen.",
+    "english": "go"
+  },
+  "give": {
+    "translation": "geben",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "geben",
+    "example": "Gib mir das Schwert.",
+    "english": "give"
+  },
+  "take": {
+    "translation": "nehmen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "nehmen",
+    "example": "Nimm den Eimer.",
+    "english": "take"
+  },
+  "buy": {
+    "translation": "kaufen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "kaufen",
+    "example": "Ich möchte ein Schwert kaufen.",
+    "english": "buy"
+  },
+  "sell": {
+    "translation": "verkaufen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "verkaufen",
+    "example": "Verkaufe das Holz.",
+    "english": "sell"
+  },
+  "talk": {
+    "translation": "sprechen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "sprechen",
+    "example": "Ich möchte mit dir sprechen.",
+    "english": "talk"
+  },
+  "need": {
+    "translation": "brauchen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "brauchen",
+    "example": "Ich brauche ein Schwert.",
+    "english": "need"
+  },
+  "want": {
+    "translation": "wollen",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "wollen",
+    "example": "Ich will Abenteuer.",
+    "english": "want"
+  },
+  "can": {
+    "translation": "können",
+    "partOfSpeech": "verb",
+    "dictionaryForm": "können",
+    "example": "Kannst du mir helfen?",
+    "english": "can"
+  },
+  "you": {
+    "translation": "du",
+    "partOfSpeech": "pronoun",
+    "dictionaryForm": "du",
+    "example": "Du bist mein Freund.",
+    "english": "you"
+  },
+  "i": {
+    "translation": "ich",
+    "partOfSpeech": "pronoun",
+    "dictionaryForm": "ich",
+    "example": "Ich brauche Hilfe.",
+    "english": "I"
+  },
+  "the": {
+    "translation": "der",
+    "partOfSpeech": "article",
+    "dictionaryForm": "der",
+    "example": "Das Schwert ist gut.",
+    "english": "the"
+  },
+  "and": {
+    "translation": "und",
+    "partOfSpeech": "conjunction",
+    "dictionaryForm": "und",
+    "example": "Schild und Schwert.",
+    "english": "and"
+  },
+  "or": {
+    "translation": "oder",
+    "partOfSpeech": "conjunction",
+    "dictionaryForm": "oder",
+    "example": "Schild oder Schwert?",
+    "english": "or"
+  },
+  "with": {
+    "translation": "mit",
+    "partOfSpeech": "preposition",
+    "dictionaryForm": "mit",
+    "example": "Komm mit mir.",
+    "english": "with"
+  }
+}
