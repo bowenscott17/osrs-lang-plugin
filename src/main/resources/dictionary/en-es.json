@@ -1,0 +1,364 @@
+{
+  "and": {
+    "dictionaryForm": "y",
+    "english": "and",
+    "example": "Escudo y espada.",
+    "partOfSpeech": "conjunction",
+    "translation": "y"
+  },
+  "axe": {
+    "dictionaryForm": "hacha",
+    "english": "axe",
+    "example": "Lleva un hacha.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el hacha"
+  },
+  "bank": {
+    "dictionaryForm": "banco",
+    "english": "bank",
+    "example": "El banco es seguro.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el banco"
+  },
+  "bread": {
+    "dictionaryForm": "pan",
+    "english": "bread",
+    "example": "Tengo un trozo de pan.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el pan"
+  },
+  "bucket": {
+    "dictionaryForm": "balde",
+    "english": "bucket",
+    "example": "¿Puedes traerme un balde de agua?",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el balde"
+  },
+  "buy": {
+    "dictionaryForm": "comprar",
+    "english": "buy",
+    "example": "Quiero comprar una espada.",
+    "partOfSpeech": "verb",
+    "translation": "comprar"
+  },
+  "can": {
+    "dictionaryForm": "poder",
+    "english": "can",
+    "example": "¿Puedes ayudarme?",
+    "partOfSpeech": "verb",
+    "translation": "poder"
+  },
+  "cheese": {
+    "dictionaryForm": "queso",
+    "english": "cheese",
+    "example": "Le gusta el queso.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el queso"
+  },
+  "chicken": {
+    "dictionaryForm": "gallina",
+    "english": "chicken",
+    "example": "La gallina pone huevos.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la gallina"
+  },
+  "coins": {
+    "dictionaryForm": "moneda",
+    "english": "coins",
+    "example": "Necesito monedas.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "las monedas"
+  },
+  "come": {
+    "dictionaryForm": "venir",
+    "english": "come",
+    "example": "Ven, por favor.",
+    "partOfSpeech": "verb",
+    "translation": "venir"
+  },
+  "fire": {
+    "dictionaryForm": "fuego",
+    "english": "fire",
+    "example": "El fuego arde fuerte.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el fuego"
+  },
+  "fish": {
+    "dictionaryForm": "pez",
+    "english": "fish",
+    "example": "El pez está fresco.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el pez"
+  },
+  "friend": {
+    "dictionaryForm": "amigo",
+    "english": "friend",
+    "example": "Mi amigo me ayuda.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el amigo"
+  },
+  "give": {
+    "dictionaryForm": "dar",
+    "english": "give",
+    "example": "Dame la espada.",
+    "partOfSpeech": "verb",
+    "translation": "dar"
+  },
+  "go": {
+    "dictionaryForm": "ir",
+    "english": "go",
+    "example": "Tengo que ir.",
+    "partOfSpeech": "verb",
+    "translation": "ir"
+  },
+  "gold": {
+    "dictionaryForm": "oro",
+    "english": "gold",
+    "example": "El oro es pesado.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el oro"
+  },
+  "goodbye": {
+    "dictionaryForm": "adiós",
+    "english": "goodbye",
+    "example": "Adiós hasta mañana.",
+    "partOfSpeech": "interjection",
+    "translation": "adiós"
+  },
+  "hammer": {
+    "dictionaryForm": "martillo",
+    "english": "hammer",
+    "example": "El martillo es pesado.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el martillo"
+  },
+  "hello": {
+    "dictionaryForm": "hola",
+    "english": "hello",
+    "example": "Hola, ¿cómo estás?",
+    "partOfSpeech": "interjection",
+    "translation": "hola"
+  },
+  "help": {
+    "dictionaryForm": "ayuda",
+    "english": "help",
+    "example": "Necesito ayuda.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la ayuda"
+  },
+  "i": {
+    "dictionaryForm": "yo",
+    "english": "I",
+    "example": "Necesito ayuda.",
+    "partOfSpeech": "pronoun",
+    "translation": "yo"
+  },
+  "iron": {
+    "dictionaryForm": "hierro",
+    "english": "iron",
+    "example": "El hierro es duro.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el hierro"
+  },
+  "master": {
+    "dictionaryForm": "maestro",
+    "english": "master",
+    "example": "El maestro me enseña.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el maestro"
+  },
+  "need": {
+    "dictionaryForm": "necesitar",
+    "english": "need",
+    "example": "Necesito una espada.",
+    "partOfSpeech": "verb",
+    "translation": "necesitar"
+  },
+  "no": {
+    "dictionaryForm": "no",
+    "english": "no",
+    "example": "No, gracias.",
+    "partOfSpeech": "adverb",
+    "translation": "no"
+  },
+  "or": {
+    "dictionaryForm": "o",
+    "english": "or",
+    "example": "¿Escudo o espada?",
+    "partOfSpeech": "conjunction",
+    "translation": "o"
+  },
+  "ore": {
+    "dictionaryForm": "mineral",
+    "english": "ore",
+    "example": "Busco mineral.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el mineral"
+  },
+  "pickaxe": {
+    "dictionaryForm": "pico",
+    "english": "pickaxe",
+    "example": "El pico se rompe.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el pico"
+  },
+  "please": {
+    "dictionaryForm": "por favor",
+    "english": "please",
+    "example": "Un balde de agua, por favor.",
+    "partOfSpeech": "adverb",
+    "translation": "por favor"
+  },
+  "quest": {
+    "dictionaryForm": "misión",
+    "english": "quest",
+    "example": "La misión es larga.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la misión"
+  },
+  "rope": {
+    "dictionaryForm": "cuerda",
+    "english": "rope",
+    "example": "La cuerda es larga.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la cuerda"
+  },
+  "sell": {
+    "dictionaryForm": "vender",
+    "english": "sell",
+    "example": "Vende la madera.",
+    "partOfSpeech": "verb",
+    "translation": "vender"
+  },
+  "shield": {
+    "dictionaryForm": "escudo",
+    "english": "shield",
+    "example": "El escudo te protege.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el escudo"
+  },
+  "shop": {
+    "dictionaryForm": "tienda",
+    "english": "shop",
+    "example": "La tienda abre a las ocho.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la tienda"
+  },
+  "sorry": {
+    "dictionaryForm": "perdón",
+    "english": "sorry",
+    "example": "Perdón, no fui yo.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "perdón"
+  },
+  "spell": {
+    "dictionaryForm": "hechizo",
+    "english": "spell",
+    "example": "El hechizo es poderoso.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el hechizo"
+  },
+  "sword": {
+    "dictionaryForm": "espada",
+    "english": "sword",
+    "example": "Necesito una espada.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la espada"
+  },
+  "take": {
+    "dictionaryForm": "tomar",
+    "english": "take",
+    "example": "Toma el balde.",
+    "partOfSpeech": "verb",
+    "translation": "tomar"
+  },
+  "talk": {
+    "dictionaryForm": "hablar",
+    "english": "talk",
+    "example": "Quiero hablar contigo.",
+    "partOfSpeech": "verb",
+    "translation": "hablar"
+  },
+  "thanks": {
+    "dictionaryForm": "gracias",
+    "english": "thanks",
+    "example": "Gracias por tu ayuda.",
+    "partOfSpeech": "interjection",
+    "translation": "gracias"
+  },
+  "the": {
+    "dictionaryForm": "el",
+    "english": "the",
+    "example": "La espada es buena.",
+    "partOfSpeech": "article",
+    "translation": "el"
+  },
+  "want": {
+    "dictionaryForm": "querer",
+    "english": "want",
+    "example": "Quiero aventuras.",
+    "partOfSpeech": "verb",
+    "translation": "querer"
+  },
+  "water": {
+    "dictionaryForm": "agua",
+    "english": "water",
+    "example": "El agua está limpia.",
+    "gender": "el",
+    "partOfSpeech": "noun",
+    "translation": "el agua"
+  },
+  "with": {
+    "dictionaryForm": "con",
+    "english": "with",
+    "example": "Ven conmigo.",
+    "partOfSpeech": "preposition",
+    "translation": "con"
+  },
+  "wood": {
+    "dictionaryForm": "madera",
+    "english": "wood",
+    "example": "La madera está seca.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la madera"
+  },
+  "yes": {
+    "dictionaryForm": "sí",
+    "english": "yes",
+    "example": "Sí, es verdad.",
+    "partOfSpeech": "adverb",
+    "translation": "sí"
+  },
+  "you": {
+    "dictionaryForm": "tú",
+    "english": "you",
+    "example": "Eres mi amigo.",
+    "partOfSpeech": "pronoun",
+    "translation": "tú"
+  }
+}

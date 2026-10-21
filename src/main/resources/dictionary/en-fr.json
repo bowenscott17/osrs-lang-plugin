@@ -1,0 +1,364 @@
+{
+  "and": {
+    "dictionaryForm": "et",
+    "english": "and",
+    "example": "Bouclier et épée.",
+    "partOfSpeech": "conjunction",
+    "translation": "et"
+  },
+  "axe": {
+    "dictionaryForm": "hache",
+    "english": "axe",
+    "example": "Il porte une hache.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la hache"
+  },
+  "bank": {
+    "dictionaryForm": "banque",
+    "english": "bank",
+    "example": "La banque est sûre.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la banque"
+  },
+  "bread": {
+    "dictionaryForm": "pain",
+    "english": "bread",
+    "example": "J'ai une tranche de pain.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le pain"
+  },
+  "bucket": {
+    "dictionaryForm": "seau",
+    "english": "bucket",
+    "example": "Peux-tu m'apporter un seau d'eau ?",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le seau"
+  },
+  "buy": {
+    "dictionaryForm": "acheter",
+    "english": "buy",
+    "example": "Je veux acheter une épée.",
+    "partOfSpeech": "verb",
+    "translation": "acheter"
+  },
+  "can": {
+    "dictionaryForm": "pouvoir",
+    "english": "can",
+    "example": "Peux-tu m'aider ?",
+    "partOfSpeech": "verb",
+    "translation": "pouvoir"
+  },
+  "cheese": {
+    "dictionaryForm": "fromage",
+    "english": "cheese",
+    "example": "Elle aime le fromage.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le fromage"
+  },
+  "chicken": {
+    "dictionaryForm": "poulet",
+    "english": "chicken",
+    "example": "Le poulet pond des œufs.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le poulet"
+  },
+  "coins": {
+    "dictionaryForm": "pièce",
+    "english": "coins",
+    "example": "J'ai besoin de pièces.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "les pièces"
+  },
+  "come": {
+    "dictionaryForm": "venir",
+    "english": "come",
+    "example": "Viens, s'il te plaît.",
+    "partOfSpeech": "verb",
+    "translation": "venir"
+  },
+  "fire": {
+    "dictionaryForm": "feu",
+    "english": "fire",
+    "example": "Le feu brûle fort.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le feu"
+  },
+  "fish": {
+    "dictionaryForm": "poisson",
+    "english": "fish",
+    "example": "Le poisson est frais.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le poisson"
+  },
+  "friend": {
+    "dictionaryForm": "ami",
+    "english": "friend",
+    "example": "Mon ami m'aide.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "l'ami"
+  },
+  "give": {
+    "dictionaryForm": "donner",
+    "english": "give",
+    "example": "Donne-moi l'épée.",
+    "partOfSpeech": "verb",
+    "translation": "donner"
+  },
+  "go": {
+    "dictionaryForm": "aller",
+    "english": "go",
+    "example": "Je dois aller.",
+    "partOfSpeech": "verb",
+    "translation": "aller"
+  },
+  "gold": {
+    "dictionaryForm": "or",
+    "english": "gold",
+    "example": "L'or est lourd.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "l'or"
+  },
+  "goodbye": {
+    "dictionaryForm": "au revoir",
+    "english": "goodbye",
+    "example": "Au revoir à demain.",
+    "partOfSpeech": "interjection",
+    "translation": "au revoir"
+  },
+  "hammer": {
+    "dictionaryForm": "marteau",
+    "english": "hammer",
+    "example": "Le marteau est lourd.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le marteau"
+  },
+  "hello": {
+    "dictionaryForm": "bonjour",
+    "english": "hello",
+    "example": "Bonjour, comment ça va ?",
+    "partOfSpeech": "interjection",
+    "translation": "bonjour"
+  },
+  "help": {
+    "dictionaryForm": "aide",
+    "english": "help",
+    "example": "J'ai besoin d'aide.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "l'aide"
+  },
+  "i": {
+    "dictionaryForm": "je",
+    "english": "I",
+    "example": "J'ai besoin d'aide.",
+    "partOfSpeech": "pronoun",
+    "translation": "je"
+  },
+  "iron": {
+    "dictionaryForm": "fer",
+    "english": "iron",
+    "example": "Le fer est dur.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le fer"
+  },
+  "master": {
+    "dictionaryForm": "maître",
+    "english": "master",
+    "example": "Le maître m'enseigne.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le maître"
+  },
+  "need": {
+    "dictionaryForm": "avoir besoin",
+    "english": "need",
+    "example": "J'ai besoin d'une épée.",
+    "partOfSpeech": "verb",
+    "translation": "avoir besoin"
+  },
+  "no": {
+    "dictionaryForm": "non",
+    "english": "no",
+    "example": "Non, merci.",
+    "partOfSpeech": "adverb",
+    "translation": "non"
+  },
+  "or": {
+    "dictionaryForm": "ou",
+    "english": "or",
+    "example": "Bouclier ou épée ?",
+    "partOfSpeech": "conjunction",
+    "translation": "ou"
+  },
+  "ore": {
+    "dictionaryForm": "minerai",
+    "english": "ore",
+    "example": "Je cherche du minerai.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le minerai"
+  },
+  "pickaxe": {
+    "dictionaryForm": "pioche",
+    "english": "pickaxe",
+    "example": "La pioche se brise.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la pioche"
+  },
+  "please": {
+    "dictionaryForm": "s'il te plaît",
+    "english": "please",
+    "example": "Un seau d'eau, s'il te plaît.",
+    "partOfSpeech": "adverb",
+    "translation": "s'il te plaît"
+  },
+  "quest": {
+    "dictionaryForm": "quête",
+    "english": "quest",
+    "example": "La quête est longue.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la quête"
+  },
+  "rope": {
+    "dictionaryForm": "corde",
+    "english": "rope",
+    "example": "La corde est longue.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la corde"
+  },
+  "sell": {
+    "dictionaryForm": "vendre",
+    "english": "sell",
+    "example": "Vends le bois.",
+    "partOfSpeech": "verb",
+    "translation": "vendre"
+  },
+  "shield": {
+    "dictionaryForm": "bouclier",
+    "english": "shield",
+    "example": "Le bouclier te protège.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le bouclier"
+  },
+  "shop": {
+    "dictionaryForm": "boutique",
+    "english": "shop",
+    "example": "La boutique ouvre à huit heures.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "la boutique"
+  },
+  "sorry": {
+    "dictionaryForm": "pardon",
+    "english": "sorry",
+    "example": "Pardon, ce n'était pas moi.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "pardon"
+  },
+  "spell": {
+    "dictionaryForm": "sort",
+    "english": "spell",
+    "example": "Le sort est puissant.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le sort"
+  },
+  "sword": {
+    "dictionaryForm": "épée",
+    "english": "sword",
+    "example": "J'ai besoin d'une épée.",
+    "gender": "la",
+    "partOfSpeech": "noun",
+    "translation": "l'épée"
+  },
+  "take": {
+    "dictionaryForm": "prendre",
+    "english": "take",
+    "example": "Prends le seau.",
+    "partOfSpeech": "verb",
+    "translation": "prendre"
+  },
+  "talk": {
+    "dictionaryForm": "parler",
+    "english": "talk",
+    "example": "Je veux te parler.",
+    "partOfSpeech": "verb",
+    "translation": "parler"
+  },
+  "thanks": {
+    "dictionaryForm": "merci",
+    "english": "thanks",
+    "example": "Merci pour ton aide.",
+    "partOfSpeech": "interjection",
+    "translation": "merci"
+  },
+  "the": {
+    "dictionaryForm": "le",
+    "english": "the",
+    "example": "L'épée est bonne.",
+    "partOfSpeech": "article",
+    "translation": "le"
+  },
+  "want": {
+    "dictionaryForm": "vouloir",
+    "english": "want",
+    "example": "Je veux des aventures.",
+    "partOfSpeech": "verb",
+    "translation": "vouloir"
+  },
+  "water": {
+    "dictionaryForm": "eau",
+    "english": "water",
+    "example": "L'eau est claire.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "l'eau"
+  },
+  "with": {
+    "dictionaryForm": "avec",
+    "english": "with",
+    "example": "Viens avec moi.",
+    "partOfSpeech": "preposition",
+    "translation": "avec"
+  },
+  "wood": {
+    "dictionaryForm": "bois",
+    "english": "wood",
+    "example": "Le bois est sec.",
+    "gender": "le",
+    "partOfSpeech": "noun",
+    "translation": "le bois"
+  },
+  "yes": {
+    "dictionaryForm": "oui",
+    "english": "yes",
+    "example": "Oui, c'est vrai.",
+    "partOfSpeech": "adverb",
+    "translation": "oui"
+  },
+  "you": {
+    "dictionaryForm": "tu",
+    "english": "you",
+    "example": "Tu es mon ami.",
+    "partOfSpeech": "pronoun",
+    "translation": "tu"
+  }
+}

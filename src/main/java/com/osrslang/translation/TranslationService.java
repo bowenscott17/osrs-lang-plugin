@@ -5,12 +5,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.plugins.Plugin;
 import com.osrslang.text.GameText;
 
 /**
@@ -37,24 +33,10 @@ public class TranslationService
 	 */
 	private final Map<String, CompletableFuture<Optional<TranslationResult>>> inFlight = new ConcurrentHashMap<>();
 
-	public TranslationService(TranslationManager manager)
+	public TranslationService(TranslationManager manager, ExecutorService executor)
 	{
 		this.manager = manager;
-
-		ThreadFactory factory = new ThreadFactory()
-		{
-			private final AtomicInteger counter = new AtomicInteger(1);
-
-			@Override
-			public Thread newThread(Runnable r)
-			{
-				Thread thread = new Thread(r, "osrs-lang-translate-" + counter.getAndIncrement());
-				thread.setDaemon(true);
-				return thread;
-			}
-		};
-
-		this.executor = Executors.newFixedThreadPool(2, factory);
+		this.executor = executor;
 	}
 
 	/**
@@ -139,7 +121,6 @@ public class TranslationService
 	 */
 	public void shutdown()
 	{
-		executor.shutdownNow();
 		inFlight.clear();
 	}
 
