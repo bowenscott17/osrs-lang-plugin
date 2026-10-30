@@ -68,8 +68,6 @@ A major focus is maintaining consistent terminology throughout the game, rather 
 
 ## 🗺️ The bigger picture
 
-German is where the project begins, but it doesn't end there.
-
 I'd like to eventually make this a flexible language-learning tool for the wider OSRS community, supporting multiple languages and allowing players to learn through the activities they already enjoy.
 
 Imagine training Woodcutting, completing quests, talking to NPCs or trading with other players while naturally picking up vocabulary along the way.
@@ -96,5 +94,3 @@ Old School RuneScape and RuneLite are trademarks and properties of their respect
 ---
 
 **Built by an OSRS player, for OSRS players.**
-
-*Learning a language, one game tick at a time.*
