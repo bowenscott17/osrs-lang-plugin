@@ -1,140 +1,104 @@
-# OSRS Language Helper
+# 🌍 OSRS Language Plugin
 
-A RuneLite plugin that translates Old School RuneScape dialogue and game text, so you can
-learn a new language while playing.
+### Experience Old School RuneScape in another language.
 
-## Status
+**OSRS Language Plugin** is an open-source RuneLite plugin built to bring language learning directly into Old School RuneScape.
 
-| Milestone | Description | State |
-|---|---|---|
-| 1 | Working RuneLite plugin from the official template | **Done** |
-| 2 | Detect accessible NPC dialogue and display it in an overlay | **Done** |
-| 3 | Local dictionary and verified translation database | **Done** (en→de/fr/es) |
-| 4 | Common translation-provider interface | **Done** |
-| 5 | Offline translation engine | **Done** (LibreTranslate sidecar) |
-| 6 | Side-by-side translated dialogue | **Done** |
-| 7 | Word-level hover translations | **Done** |
-| 8 | Persistent caching and asynchronous translation | **Done** |
-| 9 | Optional online translation | **Done** (MyMemory / LibreTranslate) |
-| 10 | Item and other accessible game-text translation | Partially (verified item names) |
-| 11 | Vocabulary saving and export | Data model + CSV export done; UI not done |
-| 12 | Tests, performance, distribution prep | 85 tests, not yet hub-submitted |
+The idea started with a simple question:
 
-## Architecture
+*What if you could learn a language while playing the game you already love?*
 
-```
-                     game widgets
-                          |
-                   DialogueReader          reads the text out of the dialogue widgets
-                          |
-                   DialogueTracker         remembers the last text seen, per client tick
-                          |
-                  TranslationService        async, de-duplicated requests
-                          |
-                  TranslationManager        picks the provider
-                          |
-        +-----------------+-----------------+
-        |                                   |
-  cache --> verified DB --> dictionary   offline engine --> online provider
-```
+Instead of constantly switching between a game and a language-learning app, I wanted to bring the learning experience directly into OSRS.
 
-Every provider implements `TranslationProvider` and reports a priority. The manager
-consults them in priority order and the first one to answer wins, so a human-verified
-phrase always beats a dictionary entry, and a dictionary entry always beats machine
-translation.
+## 🇩🇪 Built around German
 
-| Provider | Priority | Notes |
-|---|---|---|
-| Translation cache | first | Checked before anything else |
-| `OsrsTranslationDatabaseProvider` | 10 | Human-verified OSRS phrases, items, skills, quests |
-| `LocalDictionaryProvider` | 50 | Single words, with gender, part of speech, examples |
-| `OfflineMachineTranslationProvider` | 70 | Local LibreTranslate service, fallback tier |
-| `OnlineTranslationProvider` | 90 | MyMemory (free) or LibreTranslate, fallback tier |
+German is the foundation of this project.
 
-## Offline translation
+The translation system, vocabulary resources, dictionaries and language-specific features are being developed around English-to-German translation first. This provides a solid foundation for expanding the plugin to support additional languages.
 
-RuneLite's plugin rules forbid JNI, JNA, reflection and launching external processes,
-so an in-process translation engine is not possible - CTranslate2 and ONNX Runtime both
-bind to Java through JNI. There is also no pure-Java port of Argos Translate or
-Bergamot.
+Other languages are also being worked on, but they are still in development and are not yet as complete as the German implementation.
 
-The plugin therefore talks to a **LibreTranslate** service that the user runs on their
-own machine. LibreTranslate wraps the MIT-licensed Argos Translate engine, so no game
-text ever leaves the computer.
+The long-term goal is to create a flexible language-learning tool that allows players to choose their target language and learn naturally through everyday gameplay.
 
-Setup, once:
+---
 
-```bash
-pip install libretranslate
-libretranslate --load-only en,de,fr,es,ja
-```
+## 🎮 What does it do?
 
-Or with Docker: `docker compose up`. LibreTranslate downloads the models itself on
-first run; the plugin does not handle models at all.
+The aim is to translate as much of the game as possible while keeping the original OSRS experience intact.
 
-Model sizes on disk, and approximate RAM while loaded:
+Features being developed include:
 
-| Pair | Model size |
+- **NPC dialogue** – Understand conversations, interactions and quest dialogue.
+- **Items and objects** – See translated names for inventory items, ground loot and objects.
+- **Right-click menus** – Translate actions such as Chop down, Attack, Drop and Walk here.
+- **Hover translations** – Discover translations when hovering over items, NPCs, skills and other game elements.
+- **Game interfaces** – Translate interface text, buttons, banks and trading screens.
+- **Skills and prayers** – Learn the terminology used throughout the game.
+- **Spell actions** – Keep the original spellbook appearance while translating hover actions.
+- **Vocabulary and articles** – Display German grammatical articles (der, die, das) alongside relevant nouns.
+
+The goal isn't simply to replace English text. It's to make the translations useful for actually learning a language.
+
+## 🛠️ Development status
+
+This is an active development project. Features are being implemented, tested and improved individually. Some areas still need considerable work.
+
+| Area | Status |
 |---|---|
-| en→de | 144 MB |
-| en→fr | 62 MB |
-| en→es | 84 MB |
-| en→ja | 115 MB |
+| German translation foundation | Established / expanding |
+| Translation engine | In development |
+| NPC dialogue | In development |
+| Item and object names | In development |
+| Right-click menus | In development |
+| Hover translations | In development |
+| Skill tooltips | In development |
+| Bank and trading interfaces | In development |
+| German articles (der/die/das) | In development |
+| Additional languages | In development |
 
-Japanese **is** supported - the `en_ja` and `ja_en` packages both exist.
+*German is the primary development language. Additional languages are being worked on and will be expanded over time.*
 
-## Online translation
+## 🧠 How it works
 
-Disabled by default. The config item that enables it carries the third-party-server
-warning RuneLite requires.
+The plugin combines several translation approaches to make translations as consistent and useful as possible.
 
-- **MyMemory** (default) - free, no API key, no sign-up. The anonymous tier is capped
-  at 5,000 characters per day, so it suits occasional use.
-- **LibreTranslate** - the hosted `libretranslate.com` service requires a **paid** API
-  key (there is no free public instance), but a self-hosted instance needs none.
+- RuneLite's game interface and text systems.
+- Local translation resources and dictionaries.
+- OSRS-specific vocabulary.
+- A translation engine for text that isn't already covered by local resources.
+- A caching system to avoid repeatedly translating the same text.
 
-No API key is hard-coded anywhere.
+A major focus is maintaining consistent terminology throughout the game, rather than relying entirely on generic translations.
 
-## Building
+## 🗺️ The bigger picture
 
-Requires a JDK 17 or 21 to run Gradle (the plugin itself is compiled for Java 11).
+German is where the project begins, but it doesn't end there.
 
-```bash
-./gradlew build      # compile + run tests
-./gradlew test       # tests only
-./gradlew run        # launch the RuneLite dev client with this plugin
-```
+I'd like to eventually make this a flexible language-learning tool for the wider OSRS community, supporting multiple languages and allowing players to learn through the activities they already enjoy.
 
-On Windows use `gradlew.bat` instead of `./gradlew`.
+Imagine training Woodcutting, completing quests, talking to NPCs or trading with other players while naturally picking up vocabulary along the way.
 
-## Reading the RuneLite API
+That's what I'm working towards.
 
-The API is not on this machine; it is downloaded by Gradle from `repo.runelite.net`.
-To read the API source, fetch the sources jar for the version in use:
+## 🤝 Contributions and feedback
 
-```bash
-curl -L -o runelite-api-sources.jar \
-  https://repo.runelite.net/net/runelite/runelite-api/1.13.3/runelite-api-1.13.3-sources.jar
-unzip -q runelite-api-sources.jar -d runelite-api-src
-```
+This is a personal open-source project, and there's still plenty left to build.
 
-Key facts established while building this (all verified against RuneLite 1.13.3):
+If you're interested in language learning, RuneLite development, translation or Old School RuneScape, contributions and feedback are welcome.
 
-- NPC dialogue does **not** arrive through the `ChatMessage` event. Its javadoc states the
-  event does not fire for NPC dialogue. Dialogue must be read from widgets.
-- Dialogue components live in `net.runelite.api.gameval.InterfaceID`:
-  `ChatLeft.TEXT` (NPC), `ChatRight.TEXT` (player), `Chatmenu.OPTIONS` (options),
-  `ChatLeft.NAME` (NPC name).
-- `net.runelite.api.gameval.InterfaceID` constants are full component ids, usable directly
-  with `client.getWidget(int)`.
-- `PluginDescriptor.internalName` and `Filepath` (for plugin data directories) exist as of
-  RuneLite 1.13.3.
-- `TooltipManager` is a public injectable singleton, used by RuneLite's own plugins for
-  hover tooltips. Word-level hover uses it.
-- `OkHttpClient` and `Gson` are already on the classpath and must be injected, never
-  constructed. OkHttp is 3.14.9, so `RequestBody.create(MediaType, String)` uses the
-  older argument order.
+- Found a translation that doesn't make sense? Open an issue.
+- Found something that isn't being translated? Let me know.
+- Have suggestions for another language? I'd love to hear them.
+- Want to contribute? All help is appreciated.
 
-## License
+## ⚠️ Disclaimer
 
-BSD-2-Clause.
+This is an independent community project and is not affiliated with, endorsed by or associated with Jagex or Old School RuneScape.
+
+Old School RuneScape and RuneLite are trademarks and properties of their respective owners.
+
+---
+
+**Built by an OSRS player, for OSRS players.**
+
+*Learning a language, one game tick at a time.*
