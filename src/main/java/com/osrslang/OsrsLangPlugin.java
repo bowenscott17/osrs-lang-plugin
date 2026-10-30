@@ -40,7 +40,7 @@ import com.osrslang.translation.provider.OsrsTranslationDatabaseProvider;
 	name = "OSRS Language Helper",
 	description = "Translate OSRS dialogue and game text to help you learn a new language",
 	tags = {"language", "translation", "learning", "education"},
-	internalName = "osrs-lang"
+	internalName = "osrs-language-helper"
 )
 public class OsrsLangPlugin extends Plugin
 {
