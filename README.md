@@ -91,6 +91,87 @@ If you're interested in language learning, RuneLite development, translation or 
 - Have suggestions for another language? I'd love to hear them.
 - Want to contribute? All help is appreciated.
 
+## 📥 Installation
+
+### From RuneLite Plugin Hub (recommended)
+Once accepted, the plugin will be available in the RuneLite plugin panel under **OSRS Language Helper**.
+
+### Manual installation (development builds)
+1. Download the latest release JAR from the [releases page](https://github.com/bowenscott17/osrs-lang-plugin/releases)
+2. Open RuneLite → Settings → Plugin Hub → **Install plugin manually**
+3. Select the downloaded JAR
+
+### Building from source
+Requires JDK 17+ and Gradle:
+
+```bash
+git clone https://github.com/bowenscott17/osrs-lang-plugin.git
+cd osrs-lang-plugin
+./gradlew build
+```
+
+The built JAR will be in `build/libs/`.
+
+---
+
+## 🔧 Setting up LibreTranslate (offline translation)
+
+The plugin can translate text using a local LibreTranslate service. This keeps all game text on your machine — nothing leaves your computer.
+
+### Option 1: Python (quickest)
+
+```bash
+pip install libretranslate
+libretranslate --load-only en,de,fr,es
+```
+
+The `--load-only` flag pre-loads only the language pairs you need (saves RAM). Supported pairs: `en,de,fr,es,ja`.
+
+The service starts at `http://localhost:5000` by default.
+
+### Option 2: Docker
+
+```bash
+docker run -d -p 5000:5000 \
+  -e LT_LOAD_ONLY=en,de,fr,es \
+  libretranslate/libretranslate
+```
+
+Or with Docker Compose (create `docker-compose.yml`):
+
+```yaml
+services:
+  libretranslate:
+    image: libretranslate/libretranslate
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_LOAD_ONLY=en,de,fr,es
+    restart: unless-stopped
+```
+
+Then run `docker compose up -d`.
+
+### Model sizes (approximate disk / RAM)
+
+| Pair | Model size |
+|---|---|
+| en→de | 144 MB |
+| en→fr | 62 MB |
+| en→es | 84 MB |
+| en→ja | 115 MB |
+
+### Configure the plugin
+
+1. Open RuneLite → Settings → **OSRS Language Helper**
+2. Enable **Use offline translation**
+3. Set **Offline translation address** to your LibreTranslate URL (default: `http://127.0.0.1:5000`)
+4. Select your target language (German, French, Spanish, Japanese)
+
+The plugin will automatically use the local service when no verified or dictionary entry exists.
+
+---
+
 ## ⚠️ Disclaimer
 
 This is an independent community project and is not affiliated with, endorsed by or associated with Jagex or Old School RuneScape.
