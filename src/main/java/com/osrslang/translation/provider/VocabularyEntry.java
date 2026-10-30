@@ -107,24 +107,42 @@ public class VocabularyEntry
 	}
 
 	/**
+	 * The article of the noun, where the dictionary records one.
+	 * <p>
+	 * German nouns take one of three articles and the wrong choice is a mistake a learner
+	 * will repeat, so it is shown rather than left implicit in the translation. Languages
+	 * without a gendered article system simply have no value here.
+	 */
+	public Optional<String> getArticle()
+	{
+		return Optional.ofNullable(gender).filter(g -> !g.trim().isEmpty()).map(String::trim);
+	}
+
+	/**
+	 * The translation with the article in front of it.
+	 * <p>
+	 * Dictionaries disagree about whether the article belongs to the translation: some
+	 * store "das Schwert", others store "Schwert" with the article in the gender field.
+	 * Both are shown the same way here, and the article is never doubled.
+	 */
+	public String getDisplayTranslation()
+	{
+		if (gender != null && !gender.trim().isEmpty() && !startsWithWord(translation, gender.trim()))
+		{
+			return gender.trim() + " " + translation;
+		}
+
+		return translation;
+	}
+
+	/**
 	 * The lines to show in a hover tooltip for this word.
 	 */
 	public List<String> toTooltipLines()
 	{
 		List<String> lines = new java.util.ArrayList<>();
 
-		StringBuilder head = new StringBuilder();
-
-		// Some dictionaries store the article as part of the translation ("das Schwert")
-		// and some store the bare noun ("Schwert") with the article in the gender field.
-		// Only prefix the gender when the translation does not already carry it, so the
-		// head never reads "das das Schwert".
-		if (gender != null && !gender.isEmpty() && !startsWithWord(translation, gender))
-		{
-			head.append(gender).append(' ');
-		}
-		head.append(translation);
-		lines.add(head.toString());
+		lines.add(getDisplayTranslation());
 
 		if (english != null && !english.isEmpty())
 		{

@@ -95,27 +95,52 @@ public class TranslationManager
 	 */
 	public CompletableFuture<Optional<TranslationResult>> translate(String text, Language from, Language to, GameText.Type context)
 	{
-		if (text == null || text.trim().isEmpty() || from == to)
+		return translatePhrase(text, from, to, context);
+	}
+
+	/**
+	 * Translates a complete name or phrase, such as an NPC, item or object name.
+	 * <p>
+	 * This is the phrase-level counterpart of {@link #lookupWord(String, Language, Language)}.
+	 * Where a word lookup only consults the dictionary providers, this goes through the
+	 * whole chain: the verified database, the dictionary, and then the fallback engines
+	 * (the offline machine translation service, and the online provider if the user has
+	 * enabled it). That makes it possible to translate a name that no dictionary has an
+	 * entry for, provided a translation engine is available.
+	 * <p>
+	 * The returned future completes on a background thread - never on the client thread -
+	 * so callers must not assume it is already resolved when it is returned.
+	 *
+	 * @param phrase  the phrase to translate
+	 * @param from    the source language
+	 * @param to      the target language
+	 * @param context the kind of game text, used by specialised providers
+	 * @return a future completing with the translation, or empty if nothing could
+	 *         translate the phrase
+	 */
+	public CompletableFuture<Optional<TranslationResult>> translatePhrase(String phrase, Language from, Language to, GameText.Type context)
+	{
+		if (phrase == null || phrase.trim().isEmpty() || from == to)
 		{
 			return CompletableFuture.completedFuture(Optional.empty());
 		}
 
-		Optional<TranslationResult> cached = cacheGet(text, from, to);
+		Optional<TranslationResult> cached = cacheGet(phrase, from, to);
 		if (cached.isPresent())
 		{
-			log.debug("Cache hit for '{}'", text);
+			log.debug("Cache hit for '{}'", phrase);
 			return CompletableFuture.completedFuture(cached);
 		}
 
-		return ask(providers, 0, text, from, to, context)
+		return ask(providers, 0, phrase, from, to, context)
 			.thenCompose(found -> found.isPresent()
 				? CompletableFuture.completedFuture(found)
-				: ask(fallbacks, 0, text, from, to, context))
+				: ask(fallbacks, 0, phrase, from, to, context))
 			.thenApply(found ->
 			{
 				if (found.isPresent())
 				{
-					cachePut(text, from, to, found.get());
+					cachePut(phrase, from, to, found.get());
 				}
 				return found;
 			});
@@ -181,6 +206,36 @@ public class TranslationManager
 		}
 
 		return Optional.empty();
+	}
+
+	/**
+	 * Whether the vocabulary for a language pair has been read yet.
+	 * <p>
+	 * The dictionary is read in the background, so until it is there a word lookup
+	 * cannot tell a missing entry from a pair that has not been loaded. A caller that
+	 * has a fallback for a missing word waits for this before using it, so a word the
+	 * dictionary holds is never taken from the fallback instead.
+	 *
+	 * @param from the source language
+	 * @param to   the target language
+	 * @return whether the words for this pair are available
+	 */
+	public boolean isVocabularyReady(Language from, Language to)
+	{
+		for (TranslationProvider provider : providers)
+		{
+			if (!provider.isEnabled() || !provider.supports(from, to))
+			{
+				continue;
+			}
+
+			if (!provider.isVocabularyReady(from, to))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

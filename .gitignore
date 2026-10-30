@@ -8,10 +8,3 @@ nbactions.xml
 nb-configuration.xml
 nbproject/
 *.class
-*.iml
-*.log
-.backup/
-.claude/
-*.bak
-*.backup-*
-.before-*-fix-*

@@ -60,14 +60,9 @@ public class OsrsLangPluginWiringTest
 	@Test
 	public void testWordTooltipOverlayIsConstructible()
 	{
-		// The overlay needs a TranslationManager, which the plugin builds by hand
-		// rather than injecting, so it is constructed directly here.
+		// The overlay needs a TooltipManager
 		com.osrslang.overlay.WordTooltipOverlay overlay = new com.osrslang.overlay.WordTooltipOverlay(
-			mock(Client.class),
-			new TooltipManager(),
-			new com.osrslang.translation.TranslationManager(),
-			Language.ENGLISH,
-			Language.GERMAN);
+			new TooltipManager());
 
 		assertNotNull(overlay);
 	}

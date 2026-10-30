@@ -121,7 +121,7 @@ public interface OsrsLangConfig extends Config
 	@ConfigItem(
 		keyName = "hoverTranslations",
 		name = "Hover translations",
-		description = "Show a tooltip with the dictionary entry when hovering over a word",
+		description = "Show a tooltip when hovering over a word in the dialogue, or over an NPC, item or object",
 		position = 15,
 		section = displaySection
 	)
@@ -131,10 +131,70 @@ public interface OsrsLangConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "wordHoverTranslation",
+		name = "Hover a dialogue word to translate it",
+		description = "Show the translation of the individual word the mouse is over, in the languages chosen above",
+		position = 16,
+		section = displaySection
+	)
+	default boolean wordHoverTranslation()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "translateGroundItems",
+		name = "Translate ground items in the world",
+		description = "Draw the German name of every item lying on the ground directly above its sprite, so the translation is visible without hovering. Off by default because each item pays a per-frame draw cost - on a screen with hundreds of items, expect a measurable drop in framerate",
+		position = 17,
+		section = displaySection
+	)
+	default boolean translateGroundItems()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "translateSpellbookLabels",
+		name = "Translate spellbook labels",
+		description = "Draw translated spell names over the spell icons in the spellbook. Turn off to only translate the hover tooltips.",
+		position = 18,
+		section = displaySection
+	)
+	default boolean translateSpellbookLabels()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "translateInterfaceText",
+		name = "Translate interface text",
+		description = "Show the game's own labels - skills, attack styles, prayers, buttons - in the target language. Only labels with a bundled translation are changed; everything else stays in the game's language",
+		position = 19,
+		section = displaySection
+	)
+	default boolean translateInterfaceText()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "recordUntranslatedInterfaceText",
+		name = "Record untranslated interface text",
+		description = "Log each label the game draws that has no bundled translation, so the translation table can be extended with the words the game really uses",
+		position = 20,
+		section = displaySection
+	)
+	default boolean recordUntranslatedInterfaceText()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "fontSize",
 		name = "Font size",
 		description = "Size of the translation text",
-		position = 16,
+		position = 21,
 		section = displaySection
 	)
 	default int fontSize()

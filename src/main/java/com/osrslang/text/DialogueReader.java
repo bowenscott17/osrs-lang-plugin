@@ -107,6 +107,37 @@ public class DialogueReader
 	}
 
 	/**
+	 * Finds the widget a piece of dialogue is drawn in.
+	 * <p>
+	 * The text alone is not enough to work out where a word is on screen - that also needs
+	 * the widget's bounds and its font, so the widget itself has to be handed on. Returns
+	 * {@code null} when the widget is missing or hidden, which is also what
+	 * {@link com.osrslang.text.DialogueWordLayout} expects for "nothing on screen".
+	 *
+	 * @param type the kind of game text
+	 * @return the widget the text is drawn in, or {@code null}
+	 */
+	public Widget findWidget(GameText.Type type)
+	{
+		Widget widget = null;
+
+		if (type == GameText.Type.NPC_DIALOGUE)
+		{
+			widget = client.getWidget(InterfaceID.ChatLeft.TEXT);
+		}
+		else if (type == GameText.Type.PLAYER_DIALOGUE)
+		{
+			widget = client.getWidget(InterfaceID.ChatRight.TEXT);
+		}
+		else if (type == GameText.Type.DIALOGUE_OPTIONS)
+		{
+			widget = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
+		}
+
+		return widget == null || widget.isHidden() ? null : widget;
+	}
+
+	/**
 	 * Strips Jagex formatting tags and normalises the text.
 	 */
 	private String clean(String raw)
@@ -116,7 +147,7 @@ public class DialogueReader
 			return "";
 		}
 
-		// removeTags drops every tag, including the &lt;lt&gt;/&lt;gt&gt;/&lt;at&gt; that
+		// removeTags drops every tag, including the <lt>/<gt>/<at> that
 		// removeFormattingTags deliberately keeps - we want plain text to translate.
 		return Text.removeTags(raw).replace(NBSP, ' ').trim();
 	}

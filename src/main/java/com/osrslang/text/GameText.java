@@ -15,7 +15,27 @@ public class GameText
 		NPC_DIALOGUE,
 		PLAYER_DIALOGUE,
 		DIALOGUE_OPTIONS,
-		CHAT_MESSAGE
+		CHAT_MESSAGE,
+
+		/**
+		 * The name of an NPC the player is hovering over.
+		 */
+		NPC_NAME,
+
+		/**
+		 * The name of an item, whether in the inventory or on the ground.
+		 */
+		ITEM_NAME,
+
+		/**
+		 * The name of an object in the world.
+		 */
+		OBJECT_NAME,
+
+		/**
+		 * A label the game draws on the interface, such as the name of a spell.
+		 */
+		INTERFACE_TEXT
 	}
 
 	private final Type type;
