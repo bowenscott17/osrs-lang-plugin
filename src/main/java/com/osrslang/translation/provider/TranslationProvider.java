@@ -76,6 +76,22 @@ public interface TranslationProvider
 	}
 
 	/**
+	 * Whether the vocabulary for the given language pair has been read yet.
+	 * <p>
+	 * A provider that reads its words in the background answers {@code false} until they
+	 * are there, so a caller can tell "no entry for this word" from "the words have not
+	 * been read yet" and hold off rather than take the answer from somewhere else.
+	 *
+	 * @param source the language the words are written in
+	 * @param target the language the words are given in
+	 * @return whether the words for this pair are available
+	 */
+	default boolean isVocabularyReady(Language source, Language target)
+	{
+		return true;
+	}
+
+	/**
 	 * The plugin instance this provider belongs to, if any.
 	 */
 	default Plugin getPlugin()

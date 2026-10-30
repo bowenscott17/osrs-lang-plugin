@@ -4,7 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +26,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import com.osrslang.translation.Language;
+import com.osrslang.translation.ProviderLanguage;
 import com.osrslang.translation.TranslationResult;
 import com.osrslang.translation.TranslationSource;
 import com.osrslang.text.GameText;
@@ -90,6 +97,13 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 	 */
 	private volatile boolean serviceAvailable;
 
+	/**
+	 * The languages the service reported it can translate, refreshed from its
+	 * {@code /languages} endpoint. Empty until that has happened once, which is treated as
+	 * "not known yet" rather than "supports nothing".
+	 */
+	private volatile List<ProviderLanguage> languages = Collections.emptyList();
+
 	public OfflineMachineTranslationProvider(Plugin plugin, OkHttpClient httpClient, Gson gson)
 	{
 		this.plugin = plugin;
@@ -141,6 +155,23 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 		return serviceAvailable;
 	}
 
+	/**
+	 * The languages the service last reported.
+	 */
+	public List<ProviderLanguage> getLanguages()
+	{
+		return languages;
+	}
+
+	/**
+	 * Records the languages the service reported, so unsupported combinations can be
+	 * recognised instead of being attempted and failing.
+	 */
+	public void setLanguages(List<ProviderLanguage> languages)
+	{
+		this.languages = languages == null ? Collections.<ProviderLanguage>emptyList() : languages;
+	}
+
 	@Override
 	public String getName()
 	{
@@ -156,7 +187,58 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 	@Override
 	public boolean supports(Language source, Language target)
 	{
-		return source != target;
+		if (source == null || target == null || source.isSameLanguage(target))
+		{
+			return false;
+		}
+
+		// Until the language list has been fetched nothing is known, so every pair is
+		// worth a try. Once it is known, the pair is honoured exactly: asking for a model
+		// the user has not installed only produces an error.
+		if (languages.isEmpty())
+		{
+			return true;
+		}
+
+		ProviderLanguage from = findLanguage(source);
+		ProviderLanguage to = findLanguage(target);
+
+		return from != null && to != null && from.canTranslateTo(target);
+	}
+
+	/**
+	 * The reported language with the given code, matched ignoring case and any region
+	 * suffix the provider may spell differently.
+	 */
+	private ProviderLanguage findLanguage(Language language)
+	{
+		String code = language.getCode();
+
+		for (ProviderLanguage candidate : languages)
+		{
+			if (candidate.getCode().equalsIgnoreCase(code))
+			{
+				return candidate;
+			}
+		}
+
+		// A provider may report a base code ("pt") for a language the user configured
+		// with a regional one ("pt-BR"). The base code is the best available match.
+		int dash = code.indexOf('-');
+		if (dash > 0)
+		{
+			String base = code.substring(0, dash);
+
+			for (ProviderLanguage candidate : languages)
+			{
+				if (candidate.getCode().equalsIgnoreCase(base))
+				{
+					return candidate;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -346,6 +428,123 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 		});
 
 		return promise;
+	}
+
+	/**
+	 * Asks the service which languages it can translate.
+	 * <p>
+	 * The result is recorded on the provider so later lookups know which combinations are
+	 * real. The returned future completes on the OkHttp thread pool and never carries an
+	 * exception: a service that is not running simply reports nothing.
+	 */
+	public CompletableFuture<List<ProviderLanguage>> fetchLanguages()
+	{
+		CompletableFuture<List<ProviderLanguage>> promise = new CompletableFuture<>();
+
+		Request request = new Request.Builder()
+			.url(endpoint + "/languages")
+			.get()
+			.build();
+
+		httpClient.newCall(request).enqueue(new okhttp3.Callback()
+		{
+			@Override
+			public void onFailure(okhttp3.Call call, IOException e)
+			{
+				serviceAvailable = false;
+				promise.complete(Collections.<ProviderLanguage>emptyList());
+			}
+
+			@Override
+			public void onResponse(okhttp3.Call call, Response response)
+			{
+				try (ResponseBody body = response.body())
+				{
+					if (!response.isSuccessful() || body == null)
+					{
+						serviceAvailable = false;
+						promise.complete(Collections.<ProviderLanguage>emptyList());
+						return;
+					}
+
+					List<ProviderLanguage> parsed = parseLanguages(body.string());
+
+					serviceAvailable = !parsed.isEmpty();
+					setLanguages(parsed);
+
+					promise.complete(parsed);
+				}
+				catch (IOException | RuntimeException e)
+				{
+					serviceAvailable = false;
+					log.debug("Failed to read the offline service's language list", e);
+					promise.complete(Collections.<ProviderLanguage>emptyList());
+				}
+			}
+		});
+
+		return promise;
+	}
+
+	/**
+	 * One language as the {@code /languages} endpoint describes it.
+	 * <p>
+	 * {@code targets} is the list of languages a model can translate this one into. Not
+	 * every LibreTranslate build reports it, so it may be absent.
+	 */
+	static class LanguageInfo
+	{
+		String code;
+		String name;
+		List<String> targets;
+	}
+
+	/**
+	 * Parses a {@code /languages} response.
+	 * <p>
+	 * Codes are taken exactly as the service spells them, so codes that are not plain
+	 * two-letter ISO codes - {@code zh-Hans}, {@code pt-BR} - survive intact.
+	 */
+	List<ProviderLanguage> parseLanguages(String json)
+	{
+		if (json == null || json.trim().isEmpty())
+		{
+			return Collections.emptyList();
+		}
+
+		try
+		{
+			Type type = new TypeToken<List<LanguageInfo>>()
+			{
+			}.getType();
+
+			List<LanguageInfo> parsed = gson.fromJson(json, type);
+			if (parsed == null)
+			{
+				return Collections.emptyList();
+			}
+
+			List<ProviderLanguage> languages = new ArrayList<>(parsed.size());
+
+			for (LanguageInfo info : parsed)
+			{
+				if (info == null || info.code == null || info.code.trim().isEmpty())
+				{
+					continue;
+				}
+
+				languages.add(new ProviderLanguage(
+					Language.of(info.code, info.name, null),
+					info.targets == null ? Collections.<String>emptySet() : new LinkedHashSet<>(info.targets)));
+			}
+
+			return languages;
+		}
+		catch (RuntimeException e)
+		{
+			log.debug("Failed to parse the offline service's language list", e);
+			return Collections.emptyList();
+		}
 	}
 
 	/**

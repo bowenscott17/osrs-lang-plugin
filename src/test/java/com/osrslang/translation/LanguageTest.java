@@ -19,17 +19,24 @@ public class LanguageTest
 	}
 
 	@Test
-	public void testFromCodeUnknown()
+	public void testFromCodeUnknownReturnsLanguage()
 	{
-		assertFalse(Language.fromCode("xx").isPresent());
+		// Unknown codes still get a Language instance (with the code as name)
+		Optional<Language> unknown = Language.fromCode("xx");
+		assertTrue(unknown.isPresent());
+		assertEquals("xx", unknown.get().getCode());
+		assertEquals("xx", unknown.get().getName());
+
+		// But null/blank codes return empty
 		assertFalse(Language.fromCode(null).isPresent());
 		assertFalse(Language.fromCode("").isPresent());
+		assertFalse(Language.fromCode("   ").isPresent());
 	}
 
 	@Test
 	public void testCodesAreUnique()
 	{
-		assertEquals(Language.values().length, Language.codes().size());
+		assertEquals(Language.builtIns().size(), Language.codes().size());
 	}
 
 	@Test
