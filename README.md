@@ -4,10 +4,6 @@
 
 **OSRS Language Plugin** is an open-source RuneLite plugin built to bring language learning directly into Old School RuneScape.
 
-The idea started with a simple question:
-
-*What if you could learn a language while playing the game you already love?*
-
 Instead of constantly switching between a game and a language-learning app, I wanted to bring the learning experience directly into OSRS.
 
 ## 🇩🇪 Built around German
@@ -22,7 +18,7 @@ The long-term goal is to create a flexible language-learning tool that allows pl
 
 ---
 
-## 🎮 What does it do?
+##  What does it do?
 
 The aim is to translate as much of the game as possible while keeping the original OSRS experience intact.
 
