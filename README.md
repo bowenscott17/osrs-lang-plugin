@@ -45,7 +45,7 @@ Once available on the RuneLite Plugin Hub:
 3. Install and enable the plugin.
 4. Open its settings and select your preferred language.
 
-### 3. Install LibreTranslate (Optional)
+### 3. Install LibreTranslate
 
 LibreTranslate provides additional translation support and can run locally on your computer.
 
