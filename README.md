@@ -1,90 +1,90 @@
-# OSRS Language Plugin
+# OSRS Language Helper
 
-### Play Old School RuneScape in another language.
+Learn a new language while playing Old School RuneScape.
 
-OSRS Language Plugin is a RuneLite addon that brings language translation directly into Old School RuneScape.
+OSRS Language Helper is an open-source RuneLite plugin that translates in-game dialogue and text into your chosen language, helping you learn naturally as you play.
 
-It helps translate NPC conversations, items, objects, interfaces, menus and other in-game text, making it easier to experience the game in your chosen language.
+## How it works
 
-The plugin combines its own vocabulary and saved translations with LibreTranslate to provide translation support across multiple languages.
+The plugin combines several translation sources to provide translations while keeping the original game experience intact.
 
-## What does it do?
+- **Verified OSRS vocabulary:** A database of translated game terms, dialogue, items, skills and other game content.
+- **Local dictionaries:** Translates individual words and provides additional vocabulary information.
+- **LibreTranslate:** Provides machine translation through a locally running translation service.
+- **Translation cache:** Saves previous translations to reduce repeated requests.
 
-- Translate NPC dialogue and conversation options.
-- Translate item and object names.
-- Translate supported interfaces and skill names.
-- Translate right-click menus and actions.
-- Show translations when hovering over supported text.
-- Display original and translated text together.
-- Support multiple languages through vocabulary resources and LibreTranslate.
+The plugin checks its existing translations and dictionaries first, using machine translation when needed.
 
-## How does it work?
+Multiple languages are supported through the vocabulary database and LibreTranslate language models. Available languages depend on the installed translation models and vocabulary coverage.
 
-The plugin checks its vocabulary and saved translations first. If a translation isn't available, it can use LibreTranslate to translate the text.
-
-Previously translated text can be saved and reused, helping reduce repeated translation requests.
-
-LibreTranslate can run locally on your computer, meaning you don't need a paid translation API or subscription.
-
-## Getting Started
+## Getting started
 
 ### 1. Install RuneLite
 
-Download and install RuneLite from the official website:
+Download and install the official RuneLite client:
 
 https://runelite.net/
 
-Open RuneLite and make sure it is running correctly.
+### 2. Install OSRS Language Helper
 
-### 2. Install OSRS Language Plugin
+Once available through the RuneLite Plugin Hub:
 
-Once available on the RuneLite Plugin Hub:
-
-1. Open the Plugin Hub in RuneLite.
-2. Search for **OSRS Language Plugin**.
-3. Install and enable the plugin.
-4. Open its settings and select your preferred language.
+1. Open RuneLite.
+2. Open the Plugin Hub.
+3. Search for **OSRS Language Helper**.
+4. Install and enable the plugin.
 
 ### 3. Install LibreTranslate
 
-LibreTranslate provides additional translation support and can run locally on your computer.
+LibreTranslate provides offline machine translation using locally installed language models.
 
-First, install Python:
+You will need Python installed on your computer.
 
-https://www.python.org/downloads/
+Open PowerShell or a terminal and run:
 
-Open PowerShell and run:
-
-```powershell
-python -m venv libretranslate-venv
-.\libretranslate-venv\Scripts\Activate.ps1
+```bash
 pip install libretranslate
 ```
 
 Start LibreTranslate:
 
-```powershell
+```bash
 libretranslate --host 127.0.0.1 --port 5001
 ```
 
-Your local translation server will run at:
+Keep this running while playing RuneScape.
 
-`http://127.0.0.1:5001`
+The first startup may take some time while the translation models are downloaded.
 
-Keep the server running while playing and configure the plugin to use this address.
+### 4. Configure your language
 
-LibreTranslate is optional. The plugin can still use its available vocabulary and saved translations without it.
+Choose your target language in the plugin settings and configure the local LibreTranslate connection if required.
 
-## Development
+The default local address is:
 
-The plugin is an ongoing project, with new translations, vocabulary and improvements being added over time.
+```text
+http://127.0.0.1:5001
+```
 
-Language coverage and translation quality can vary depending on the available resources and translation engine.
+Make sure the corresponding language models are installed in LibreTranslate.
 
-If you find a translation that needs fixing or have an idea for an improvement, feedback and contributions are always welcome.
+## Supported languages
 
----
+The plugin is designed to support multiple languages rather than being limited to one language.
 
-**Thanks for checking out the project and happy scaping!**
+Translation coverage varies depending on the available vocabulary database and LibreTranslate language models.
 
-An independent community project for RuneLite and Old School RuneScape. Not affiliated with or endorsed by Jagex.
+Additional vocabulary and language support can be expanded over time.
+
+## Privacy and costs
+
+- No API key is required for locally hosted LibreTranslate.
+- Local machine translation runs on your own computer.
+- No paid translation subscription is required for local translation.
+- Optional online translation providers may use third-party services.
+
+## Open source
+
+OSRS Language Helper is an open-source project. Contributions, feedback and additional language resources are welcome.
+
+**License:** BSD-2-Clause
