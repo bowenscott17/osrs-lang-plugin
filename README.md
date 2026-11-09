@@ -1,140 +1,90 @@
 # OSRS Language Helper
 
-A RuneLite plugin that translates Old School RuneScape dialogue and game text, so you can
-learn a new language while playing.
+Learn a new language while playing Old School RuneScape.
 
-## Status
+OSRS Language Helper is an open-source RuneLite plugin that translates in-game dialogue and text into your chosen language, helping you learn naturally as you play.
 
-| Milestone | Description | State |
-|---|---|---|
-| 1 | Working RuneLite plugin from the official template | **Done** |
-| 2 | Detect accessible NPC dialogue and display it in an overlay | **Done** |
-| 3 | Local dictionary and verified translation database | **Done** (en→de/fr/es) |
-| 4 | Common translation-provider interface | **Done** |
-| 5 | Offline translation engine | **Done** (LibreTranslate sidecar) |
-| 6 | Side-by-side translated dialogue | **Done** |
-| 7 | Word-level hover translations | **Done** |
-| 8 | Persistent caching and asynchronous translation | **Done** |
-| 9 | Optional online translation | **Done** (MyMemory / LibreTranslate) |
-| 10 | Item and other accessible game-text translation | Partially (verified item names) |
-| 11 | Vocabulary saving and export | Data model + CSV export done; UI not done |
-| 12 | Tests, performance, distribution prep | 85 tests, not yet hub-submitted |
+## How it works
 
-## Architecture
+The plugin combines several translation sources to provide translations while keeping the original game experience intact.
 
-```
-                     game widgets
-                          |
-                   DialogueReader          reads the text out of the dialogue widgets
-                          |
-                   DialogueTracker         remembers the last text seen, per client tick
-                          |
-                  TranslationService        async, de-duplicated requests
-                          |
-                  TranslationManager        picks the provider
-                          |
-        +-----------------+-----------------+
-        |                                   |
-  cache --> verified DB --> dictionary   offline engine --> online provider
-```
+- **Verified OSRS vocabulary:** A database of translated game terms, dialogue, items, skills and other game content.
+- **Local dictionaries:** Translates individual words and provides additional vocabulary information.
+- **LibreTranslate:** Provides machine translation through a locally running translation service.
+- **Translation cache:** Saves previous translations to reduce repeated requests.
 
-Every provider implements `TranslationProvider` and reports a priority. The manager
-consults them in priority order and the first one to answer wins, so a human-verified
-phrase always beats a dictionary entry, and a dictionary entry always beats machine
-translation.
+The plugin checks its existing translations and dictionaries first, using machine translation when needed.
 
-| Provider | Priority | Notes |
-|---|---|---|
-| Translation cache | first | Checked before anything else |
-| `OsrsTranslationDatabaseProvider` | 10 | Human-verified OSRS phrases, items, skills, quests |
-| `LocalDictionaryProvider` | 50 | Single words, with gender, part of speech, examples |
-| `OfflineMachineTranslationProvider` | 70 | Local LibreTranslate service, fallback tier |
-| `OnlineTranslationProvider` | 90 | MyMemory (free) or LibreTranslate, fallback tier |
+Multiple languages are supported through the vocabulary database and LibreTranslate language models. Available languages depend on the installed translation models and vocabulary coverage.
 
-## Offline translation
+## Getting started
 
-RuneLite's plugin rules forbid JNI, JNA, reflection and launching external processes,
-so an in-process translation engine is not possible - CTranslate2 and ONNX Runtime both
-bind to Java through JNI. There is also no pure-Java port of Argos Translate or
-Bergamot.
+### 1. Install RuneLite
 
-The plugin therefore talks to a **LibreTranslate** service that the user runs on their
-own machine. LibreTranslate wraps the MIT-licensed Argos Translate engine, so no game
-text ever leaves the computer.
+Download and install the official RuneLite client:
 
-Setup, once:
+https://runelite.net/
+
+### 2. Install OSRS Language Helper
+
+Once available through the RuneLite Plugin Hub:
+
+1. Open RuneLite.
+2. Open the Plugin Hub.
+3. Search for **OSRS Language Helper**.
+4. Install and enable the plugin.
+
+### 3. Install LibreTranslate
+
+LibreTranslate provides offline machine translation using locally installed language models.
+
+You will need Python installed on your computer.
+
+Open PowerShell or a terminal and run:
 
 ```bash
 pip install libretranslate
-libretranslate --load-only en,de,fr,es,ja
 ```
 
-Or with Docker: `docker compose up`. LibreTranslate downloads the models itself on
-first run; the plugin does not handle models at all.
-
-Model sizes on disk, and approximate RAM while loaded:
-
-| Pair | Model size |
-|---|---|
-| en→de | 144 MB |
-| en→fr | 62 MB |
-| en→es | 84 MB |
-| en→ja | 115 MB |
-
-Japanese **is** supported - the `en_ja` and `ja_en` packages both exist.
-
-## Online translation
-
-Disabled by default. The config item that enables it carries the third-party-server
-warning RuneLite requires.
-
-- **MyMemory** (default) - free, no API key, no sign-up. The anonymous tier is capped
-  at 5,000 characters per day, so it suits occasional use.
-- **LibreTranslate** - the hosted `libretranslate.com` service requires a **paid** API
-  key (there is no free public instance), but a self-hosted instance needs none.
-
-No API key is hard-coded anywhere.
-
-## Building
-
-Requires a JDK 17 or 21 to run Gradle (the plugin itself is compiled for Java 11).
+Start LibreTranslate:
 
 ```bash
-./gradlew build      # compile + run tests
-./gradlew test       # tests only
-./gradlew run        # launch the RuneLite dev client with this plugin
+libretranslate --host 127.0.0.1 --port 5001
 ```
 
-On Windows use `gradlew.bat` instead of `./gradlew`.
+Keep this running while playing RuneScape.
 
-## Reading the RuneLite API
+The first startup may take some time while the translation models are downloaded.
 
-The API is not on this machine; it is downloaded by Gradle from `repo.runelite.net`.
-To read the API source, fetch the sources jar for the version in use:
+### 4. Configure your language
 
-```bash
-curl -L -o runelite-api-sources.jar \
-  https://repo.runelite.net/net/runelite/runelite-api/1.13.3/runelite-api-1.13.3-sources.jar
-unzip -q runelite-api-sources.jar -d runelite-api-src
+Choose your target language in the plugin settings and configure the local LibreTranslate connection if required.
+
+The default local address is:
+
+```text
+http://127.0.0.1:5001
 ```
 
-Key facts established while building this (all verified against RuneLite 1.13.3):
+Make sure the corresponding language models are installed in LibreTranslate.
 
-- NPC dialogue does **not** arrive through the `ChatMessage` event. Its javadoc states the
-  event does not fire for NPC dialogue. Dialogue must be read from widgets.
-- Dialogue components live in `net.runelite.api.gameval.InterfaceID`:
-  `ChatLeft.TEXT` (NPC), `ChatRight.TEXT` (player), `Chatmenu.OPTIONS` (options),
-  `ChatLeft.NAME` (NPC name).
-- `net.runelite.api.gameval.InterfaceID` constants are full component ids, usable directly
-  with `client.getWidget(int)`.
-- `PluginDescriptor.internalName` and `Filepath` (for plugin data directories) exist as of
-  RuneLite 1.13.3.
-- `TooltipManager` is a public injectable singleton, used by RuneLite's own plugins for
-  hover tooltips. Word-level hover uses it.
-- `OkHttpClient` and `Gson` are already on the classpath and must be injected, never
-  constructed. OkHttp is 3.14.9, so `RequestBody.create(MediaType, String)` uses the
-  older argument order.
+## Supported languages
 
-## License
+The plugin is designed to support multiple languages rather than being limited to one language.
 
-BSD-2-Clause.
+Translation coverage varies depending on the available vocabulary database and LibreTranslate language models.
+
+Additional vocabulary and language support can be expanded over time.
+
+## Privacy and costs
+
+- No API key is required for locally hosted LibreTranslate.
+- Local machine translation runs on your own computer.
+- No paid translation subscription is required for local translation.
+- Optional online translation providers may use third-party services.
+
+## Open source
+
+OSRS Language Helper is an open-source project. Contributions, feedback and additional language resources are welcome.
+
+**License:** BSD-2-Clause
