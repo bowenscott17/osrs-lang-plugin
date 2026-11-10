@@ -107,6 +107,63 @@ public class DialogueReader
 	}
 
 	/**
+	 * Reads the quest reward interface, if one is showing.
+	 * <p>
+	 * The quest reward interface shows experience gained and items received after
+	 * completing a quest.
+	 *
+	 * @return the quest reward text, or {@code null} if no quest reward is showing
+	 */
+	public GameText readQuestReward()
+	{
+		// Quest reward interface (interface 291 in OSRS)
+		// Try multiple possible text component IDs
+		Widget text = client.getWidget(291, 2);
+		if (text == null || text.isHidden())
+		{
+			text = client.getWidget(291, 3);
+		}
+		if (text == null || text.isHidden())
+		{
+			text = client.getWidget(291, 1);
+		}
+		if (text == null || text.isHidden())
+		{
+			// Fallback: try the old InterfaceID constant if it exists
+			try
+			{
+				java.lang.reflect.Field field = net.runelite.api.gameval.InterfaceID.class.getField("QuestReward");
+				if (field != null)
+				{
+					Object questReward = field.get(null);
+					java.lang.reflect.Field textField = questReward.getClass().getField("TEXT");
+					if (textField != null)
+					{
+						int textId = textField.getInt(null);
+						text = client.getWidget(291, textId);
+					}
+				}
+			}
+			catch (ReflectiveOperationException ignored)
+			{
+			}
+		}
+
+		if (text == null || text.isHidden())
+		{
+			return null;
+		}
+
+		String content = clean(text.getText());
+		if (content.isEmpty())
+		{
+			return null;
+		}
+
+		return new GameText(GameText.Type.QUEST_REWARD, content);
+	}
+
+	/**
 	 * Finds the widget a piece of dialogue is drawn in.
 	 * <p>
 	 * The text alone is not enough to work out where a word is on screen - that also needs
@@ -132,6 +189,18 @@ public class DialogueReader
 		else if (type == GameText.Type.DIALOGUE_OPTIONS)
 		{
 			widget = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
+		}
+		else if (type == GameText.Type.QUEST_REWARD)
+		{
+			widget = client.getWidget(291, 2);
+			if (widget == null || widget.isHidden())
+			{
+				widget = client.getWidget(291, 3);
+			}
+			if (widget == null || widget.isHidden())
+			{
+				widget = client.getWidget(291, 1);
+			}
 		}
 
 		return widget == null || widget.isHidden() ? null : widget;

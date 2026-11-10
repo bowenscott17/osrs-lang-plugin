@@ -179,6 +179,30 @@ public interface OsrsLangConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "translateQuestRewards",
+		name = "Translate quest rewards",
+		description = "Translate the quest reward interface including multi-line experience messages (e.g. 'You gained: X Skill Experience. Click here to continue.')",
+		position = 20,
+		section = displaySection
+	)
+	default boolean translateQuestRewards()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "translateQuestHelper",
+		name = "Translate Quest Helper plugin",
+		description = "Translate the Zoinkwiz Quest Helper sidebar panel text and in-game overlay text. Requires the Quest Helper plugin to be installed and enabled.",
+		position = 21,
+		section = displaySection
+	)
+	default boolean translateQuestHelper()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "recordUntranslatedInterfaceText",
 		name = "Record untranslated interface text",
 		description = "Log each label the game draws that has no bundled translation, so the translation table can be extended with the words the game really uses",

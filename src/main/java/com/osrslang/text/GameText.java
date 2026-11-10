@@ -35,7 +35,17 @@ public class GameText
 		/**
 		 * A label the game draws on the interface, such as the name of a spell.
 		 */
-		INTERFACE_TEXT
+		INTERFACE_TEXT,
+
+		/**
+		 * The quest reward interface showing experience gained and items received.
+		 */
+		QUEST_REWARD,
+
+		/**
+		 * The Zoinkwiz Quest Helper plugin text (sidebar panel and overlay).
+		 */
+		QUEST_HELPER
 	}
 
 	private final Type type;

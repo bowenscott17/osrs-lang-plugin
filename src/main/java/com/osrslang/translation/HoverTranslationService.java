@@ -220,6 +220,7 @@ public class HoverTranslationService
 
 		if (dictionaryArticle != null)
 		{
+			log.debug("Article from dictionary for '{}': {}", name, dictionaryArticle);
 			return result.withGrammar(entry, dictionaryArticle, "the dictionary");
 		}
 
@@ -232,6 +233,7 @@ public class HoverTranslationService
 		}
 
 		String translated = result.getTranslatedText();
+		log.debug("Checking article for translated='{}', nounDatabase={}", translated, nounDatabase);
 		String leading = TranslationResult.MASCULINE_ARTICLE.equals(translated)
 			|| TranslationResult.FEMININE_ARTICLE.equals(translated)
 			|| TranslationResult.NEUTER_ARTICLE.equals(translated)
@@ -240,6 +242,7 @@ public class HoverTranslationService
 
 		if (leading != null)
 		{
+			log.debug("Article from translation leading word for '{}': {}", name, leading);
 			return result.withGrammar(entry, leading, "the translation");
 		}
 
@@ -249,10 +252,12 @@ public class HoverTranslationService
 				.filter(this::isRecognisedArticle);
 			if (fromTable.isPresent())
 			{
+				log.debug("Article from noun table for '{}': {}", name, fromTable.get());
 				return result.withGrammar(entry, fromTable.get(), "the noun table");
 			}
 		}
 
+		log.debug("No article found for '{}' (translated='{}')", name, translated);
 		return result.withGrammar(entry, null, null);
 	}
 

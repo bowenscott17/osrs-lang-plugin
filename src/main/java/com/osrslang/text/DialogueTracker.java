@@ -61,6 +61,10 @@ public class DialogueTracker
 		{
 			observed = reader.readDialogueOptions();
 		}
+		if (observed == null)
+		{
+			observed = reader.readQuestReward();
+		}
 
 		if (observed == null)
 		{

@@ -50,6 +50,7 @@ import com.osrslang.translation.HoverTranslationService;
 import com.osrslang.translation.JsonTranslationCache;
 import com.osrslang.translation.Language;
 import com.osrslang.translation.LanguageSupportService;
+import com.osrslang.translation.QuestHelperTranslationService;
 import com.osrslang.translation.TranslationManager;
 import com.osrslang.translation.TranslationService;
 import com.osrslang.translation.WordTranslation;
@@ -59,6 +60,7 @@ import com.osrslang.translation.provider.OfflineMachineTranslationProvider;
 import com.osrslang.translation.provider.OnlineTranslationProvider;
 import com.osrslang.translation.provider.OsrsCacheTranslationProvider;
 import com.osrslang.translation.provider.OsrsTranslationDatabaseProvider;
+import net.runelite.client.plugins.PluginManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -108,6 +110,9 @@ public class OsrsLangPlugin extends Plugin
 	@Inject
 	private EventBus eventBus;
 
+	@Inject
+	private PluginManager pluginManager;
+
 	/**
 	 * The pool translation work runs on. Wrapped so uncaught exceptions are logged
 	 * rather than silently killing a thread.
@@ -137,6 +142,12 @@ public class OsrsLangPlugin extends Plugin
 	private InterfaceStringDatabase interfaceStrings;
 	private InterfaceTextTranslator interfaceText;
 	private SpellTooltipTranslator spellTooltips;
+	private QuestHelperTranslationService questHelperTranslationService;
+
+	/**
+	 * Tick counter for periodic Quest Helper panel refresh.
+	 */
+	private int questHelperTickCounter = 0;
 
 	/**
 	 * Temporary diagnostic that reports what the client keeps on the skills panel.
@@ -250,6 +261,8 @@ public class OsrsLangPlugin extends Plugin
 
 		translationService = new TranslationService(translationManager, translationExecutor);
 		nounDatabase = new GermanNounDatabase(gson);
+		// Pre-load the noun database so it's ready when hover translations need articles
+		nounDatabase.load(from, to);
 		hoverTranslationService = new HoverTranslationService(translationManager, translationExecutor, nounDatabase);
 
 		// Asks the offline service what it can translate, so the language selectors only
@@ -319,6 +332,16 @@ public class OsrsLangPlugin extends Plugin
 		menuOverlay = new GermanMenuOverlay(this, client);
 		// overlayManager.add(menuOverlay);
 
+		// The Quest Helper translation service translates the Zoinkwiz Quest Helper
+		// plugin's sidebar panel and in-game overlay text. It uses reflection to hook
+		// into the plugin when present, so this plugin still works without it.
+		questHelperTranslationService = new QuestHelperTranslationService(
+			translationManager, translationExecutor, client, clientThread, overlayManager, pluginManager);
+		if (config.translateQuestHelper())
+		{
+			questHelperTranslationService.tryHookQuestHelper();
+		}
+
 		// The chat-message translator subscribes to ChatMessage events itself; the
 		// overlay just renders the recent buffer. Both are registered after the
 		// hover service is built so the cache they share is ready.
@@ -327,6 +350,7 @@ public class OsrsLangPlugin extends Plugin
 		overlayManager.add(chatTranslationOverlay);
 		eventBus.register(chatTranslator);
 		refreshChatTranslation();
+
 
 		// Registered asynchronously because the command may refresh the service's
 		// language list, and that is network work the client thread must not do.
@@ -600,6 +624,28 @@ public class OsrsLangPlugin extends Plugin
 			refreshChatTranslation();
 		}
 
+		// Quest Helper translation toggle
+		if ("translateQuestHelper".equals(event.getKey()))
+		{
+			if (questHelperTranslationService != null)
+			{
+				if (config.translateQuestHelper())
+				{
+					questHelperTranslationService.tryHookQuestHelper();
+				}
+				else
+				{
+					questHelperTranslationService.clear();
+				}
+			}
+		}
+
+		// Quest Rewards translation toggle
+		if ("translateQuestRewards".equals(event.getKey()))
+		{
+			clearContent();
+		}
+
 		if ("sourceLanguage".equals(event.getKey()) || "targetLanguage".equals(event.getKey()))
 		{
 			// The names already translated are for the old language pair, so they are
@@ -611,6 +657,12 @@ public class OsrsLangPlugin extends Plugin
 			if (wordTranslationService != null)
 			{
 				wordTranslationService.clear();
+			}
+			// Quest Helper translation service cleanup
+			if (questHelperTranslationService != null)
+			{
+				questHelperTranslationService.clear();
+				questHelperTranslationService = null;
 			}
 			if (dialogueWords != null)
 			{
@@ -635,6 +687,12 @@ public class OsrsLangPlugin extends Plugin
 
 			// The dictionaries for the new pair have not been read yet.
 			loadLanguageData(from, to);
+
+			// Pre-load the noun database for the new language pair
+			if (nounDatabase != null)
+			{
+				nounDatabase.load(from, to);
+			}
 
 			// The skills panel draws translated names from the freshly loaded table.
 			refreshSkillsOverlay();
@@ -889,6 +947,7 @@ public class OsrsLangPlugin extends Plugin
 		updateHover();
 		updateInterfaceText();
 		updateSpellTooltips();
+		updateQuestHelper();
 	}
 
 	/**
@@ -913,40 +972,72 @@ public class OsrsLangPlugin extends Plugin
 			language(config.targetLanguage(), Language.GERMAN));
 	}
 
-	/**
-	 * Rewrites the game's own labels into the chosen language.
-	 * <p>
-	 * The interface tree is walked every tick because the client rebuilds widgets
-	 * constantly, and a rebuilt widget comes back with the game's text on it. Only the
-	 * text of a widget is ever written, never its size or position, so the clickable
-	 * areas of the attack styles and prayers are left as the client laid them out.
-	 */
-	private void updateInterfaceText()
-	{
-		if (interfaceText == null || interfaceStrings == null)
-		{
-			return;
-		}
 
-		if (!config.showTranslations() || !config.translateInterfaceText())
-		{
-			// Restores every label already translated, and is a no-op once they are all
-			// back, so this is safe to call every tick while the setting is off.
-			interfaceText.restore();
-			return;
-		}
+/**
+ * Updates the Quest Helper plugin translation.
+ * <p>
+ * The Quest Helper panel content changes when the quest step changes, so we
+ * periodically re-translate the panel components. We only do this when the
+ * translation is enabled and the Quest Helper plugin is hooked.
+ */
+private void updateQuestHelper()
+{
+    if (questHelperTranslationService == null || !config.translateQuestHelper())
+    {
+        return;
+    }
 
-		interfaceText.update(
-			language(config.sourceLanguage(), Language.ENGLISH),
-			language(config.targetLanguage(), Language.GERMAN));
-	}
+    if (!questHelperTranslationService.isQuestHelperFound())
+    {
+        // Try to hook if not already hooked
+        questHelperTranslationService.tryHookQuestHelper();
+        return;
+    }
+
+    // Re-translate the panel components periodically
+    // We use a simple tick counter to avoid doing it every tick
+    questHelperTickCounter++;
+    if (questHelperTickCounter >= 20) // Every ~20 ticks (about once per second)
+    {
+        questHelperTickCounter = 0;
+        questHelperTranslationService.refreshQuestHelperPanel();
+    }
+}
+
+/**
+ * Rewrites the game's own labels into the chosen language.
+ * <p>
+ * The interface tree is walked every tick because the client rebuilds widgets
+ * constantly, and a rebuilt widget comes back with the game's text on it. Only the
+ * text of a widget is ever written, never its size or position, so the clickable
+ * areas of the attack styles and prayers are left as the client laid them out.
+ */
+private void updateInterfaceText()
+{
+    if (interfaceText == null || interfaceStrings == null)
+    {
+        return;
+    }
+
+    if (!config.showTranslations() || !config.translateInterfaceText())
+    {
+        // Restores every label already translated, and is a no-op once they are all
+        // back, so this is safe to call every tick while the setting is off.
+        interfaceText.restore();
+        return;
+    }
+
+    interfaceText.update(
+        language(config.sourceLanguage(), Language.ENGLISH),
+        language(config.targetLanguage(), Language.GERMAN));
+}
 
 	/**
 	 * Updates the dialogue panel and the word tooltips.
 	 */
 	private void updateDialogue()
 	{
-		if (!config.showTranslations() || !config.translateDialogue())
+		if (!config.showTranslations() || (!config.translateDialogue() && !config.translateQuestRewards()))
 		{
 			clearContent();
 			return;
@@ -959,6 +1050,12 @@ public class OsrsLangPlugin extends Plugin
 			return;
 		}
 
+		// Skip quest reward dialogue if the setting is off
+		if (dialogue.getType() == GameText.Type.QUEST_REWARD && !config.translateQuestRewards())
+		{
+			clearContent();
+			return;
+		}
 		String original = dialogue.getText();
 
 		if (!original.equals(currentOriginal))

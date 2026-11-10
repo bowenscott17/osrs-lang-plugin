@@ -202,13 +202,24 @@ public class GermanNounDatabase
 	 */
 	private Map<String, String> load()
 	{
-		try (InputStream in = GermanNounDatabase.class.getResourceAsStream(RESOURCE))
+		// Try the class's classloader first (works in dev), then the context classloader
+		// (works when loaded by RuneLite's plugin classloader)
+		InputStream in = GermanNounDatabase.class.getResourceAsStream(RESOURCE);
+		if (in == null)
 		{
-			if (in == null)
-			{
-				log.debug("No bundled German noun table at {}", RESOURCE);
-				return Collections.emptyMap();
-			}
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(RESOURCE);
+		}
+		if (in == null)
+		{
+			// As a last resort, try the system classloader
+			in = ClassLoader.getSystemResourceAsStream(RESOURCE.substring(1)); // remove leading slash
+		}
+
+		if (in == null)
+		{
+			log.debug("No bundled German noun table at {}", RESOURCE);
+			return Collections.emptyMap();
+		}
 
 			Type type = new TypeToken<Map<String, String>>()
 			{
@@ -240,6 +251,7 @@ public class GermanNounDatabase
 				}
 
 				log.debug("Loaded {} German nouns for article lookup", byNoun.size());
+			log.info("German noun table loaded successfully with {} entries", byNoun.size());
 				return Collections.unmodifiableMap(byNoun);
 			}
 		}
