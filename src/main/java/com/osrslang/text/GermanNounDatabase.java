@@ -254,7 +254,6 @@ public class GermanNounDatabase
 			log.info("German noun table loaded successfully with {} entries", byNoun.size());
 				return Collections.unmodifiableMap(byNoun);
 			}
-		}
 		catch (IOException | RuntimeException e)
 		{
 			log.warn("Failed to load German noun table", e);
