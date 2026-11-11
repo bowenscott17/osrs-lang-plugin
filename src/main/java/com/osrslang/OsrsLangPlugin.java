@@ -50,7 +50,6 @@ import com.osrslang.translation.HoverTranslationService;
 import com.osrslang.translation.JsonTranslationCache;
 import com.osrslang.translation.Language;
 import com.osrslang.translation.LanguageSupportService;
-import com.osrslang.translation.QuestHelperTranslationService;
 import com.osrslang.translation.TranslationManager;
 import com.osrslang.translation.TranslationService;
 import com.osrslang.translation.WordTranslation;
@@ -67,7 +66,7 @@ import net.runelite.client.plugins.PluginManager;
 	name = "OSRS Language Helper",
 	description = "Translate OSRS dialogue and game text to help you learn a new language",
 	tags = {"language", "translation", "learning", "education"},
-	internalName = "osrs-lang"
+	internalName = "osrs-language-helper"
 )
 public class OsrsLangPlugin extends Plugin
 {
@@ -142,12 +141,6 @@ public class OsrsLangPlugin extends Plugin
 	private InterfaceStringDatabase interfaceStrings;
 	private InterfaceTextTranslator interfaceText;
 	private SpellTooltipTranslator spellTooltips;
-	private QuestHelperTranslationService questHelperTranslationService;
-
-	/**
-	 * Tick counter for periodic Quest Helper panel refresh.
-	 */
-	private int questHelperTickCounter = 0;
 
 	/**
 	 * Temporary diagnostic that reports what the client keeps on the skills panel.
@@ -331,16 +324,6 @@ public class OsrsLangPlugin extends Plugin
 		// re-enablement once a way to hide the original underneath is found.
 		menuOverlay = new GermanMenuOverlay(this, client);
 		// overlayManager.add(menuOverlay);
-
-		// The Quest Helper translation service translates the Zoinkwiz Quest Helper
-		// plugin's sidebar panel and in-game overlay text. It uses reflection to hook
-		// into the plugin when present, so this plugin still works without it.
-		questHelperTranslationService = new QuestHelperTranslationService(
-			translationManager, translationExecutor, client, clientThread, overlayManager, pluginManager);
-		if (config.translateQuestHelper())
-		{
-			questHelperTranslationService.tryHookQuestHelper();
-		}
 
 		// The chat-message translator subscribes to ChatMessage events itself; the
 		// overlay just renders the recent buffer. Both are registered after the
@@ -624,22 +607,6 @@ public class OsrsLangPlugin extends Plugin
 			refreshChatTranslation();
 		}
 
-		// Quest Helper translation toggle
-		if ("translateQuestHelper".equals(event.getKey()))
-		{
-			if (questHelperTranslationService != null)
-			{
-				if (config.translateQuestHelper())
-				{
-					questHelperTranslationService.tryHookQuestHelper();
-				}
-				else
-				{
-					questHelperTranslationService.clear();
-				}
-			}
-		}
-
 		// Quest Rewards translation toggle
 		if ("translateQuestRewards".equals(event.getKey()))
 		{
@@ -657,12 +624,6 @@ public class OsrsLangPlugin extends Plugin
 			if (wordTranslationService != null)
 			{
 				wordTranslationService.clear();
-			}
-			// Quest Helper translation service cleanup
-			if (questHelperTranslationService != null)
-			{
-				questHelperTranslationService.clear();
-				questHelperTranslationService = null;
 			}
 			if (dialogueWords != null)
 			{
@@ -947,7 +908,6 @@ public class OsrsLangPlugin extends Plugin
 		updateHover();
 		updateInterfaceText();
 		updateSpellTooltips();
-		updateQuestHelper();
 	}
 
 	/**
@@ -973,36 +933,6 @@ public class OsrsLangPlugin extends Plugin
 	}
 
 
-/**
- * Updates the Quest Helper plugin translation.
- * <p>
- * The Quest Helper panel content changes when the quest step changes, so we
- * periodically re-translate the panel components. We only do this when the
- * translation is enabled and the Quest Helper plugin is hooked.
- */
-private void updateQuestHelper()
-{
-    if (questHelperTranslationService == null || !config.translateQuestHelper())
-    {
-        return;
-    }
-
-    if (!questHelperTranslationService.isQuestHelperFound())
-    {
-        // Try to hook if not already hooked
-        questHelperTranslationService.tryHookQuestHelper();
-        return;
-    }
-
-    // Re-translate the panel components periodically
-    // We use a simple tick counter to avoid doing it every tick
-    questHelperTickCounter++;
-    if (questHelperTickCounter >= 20) // Every ~20 ticks (about once per second)
-    {
-        questHelperTickCounter = 0;
-        questHelperTranslationService.refreshQuestHelperPanel();
-    }
-}
 
 /**
  * Rewrites the game's own labels into the chosen language.
