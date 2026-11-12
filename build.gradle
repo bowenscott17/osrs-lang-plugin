@@ -32,7 +32,7 @@ sourceSets {
 	main {
 		resources {
 			srcDirs = ['src/main/resources']
-			includes = ['runelite-plugin.properties', 'dictionary/**', 'interface-strings/**', 'osrs-translations/**']
+			includes = ['runelite-plugin.properties', 'dictionary/**', 'interface-strings/**', 'osrs-translations/**', 'german-nouns.json']
 		}
 	}
 }
