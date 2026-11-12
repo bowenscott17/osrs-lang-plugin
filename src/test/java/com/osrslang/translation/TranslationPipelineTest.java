@@ -54,12 +54,12 @@ public class TranslationPipelineTest
 	public void testDictionaryIsUsedWhenNothingIsVerified() throws ExecutionException, InterruptedException
 	{
 		Optional<TranslationResult> result = manager
-			.translate("hammer", Language.ENGLISH, Language.GERMAN, GameText.Type.NPC_DIALOGUE)
+			.translate("please", Language.ENGLISH, Language.GERMAN, GameText.Type.NPC_DIALOGUE)
 			.get();
 
 		assertTrue(result.isPresent());
 		assertEquals(TranslationSource.DICTIONARY, result.get().getSource());
-		assertEquals("der Hammer", result.get().getTranslatedText());
+		assertEquals("bitte", result.get().getTranslatedText());
 	}
 
 	@Test

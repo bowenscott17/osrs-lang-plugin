@@ -66,7 +66,7 @@ import net.runelite.client.plugins.PluginManager;
 	name = "OSRS Language Helper",
 	description = "Translate OSRS dialogue and game text to help you learn a new language",
 	tags = {"language", "translation", "learning", "education"},
-	internalName = "osrs-language-helper"
+	internalName = "osrs-lang"
 )
 public class OsrsLangPlugin extends Plugin
 {

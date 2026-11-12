@@ -1,6 +1,7 @@
 package com.osrslang.translation.provider;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,21 +41,6 @@ public class OsrsCacheTranslationProvider implements TranslationProvider
 	 */
 	public static final int GERMAN_LANGUAGE_GROUP = 7;
 
-	/**
-	 * The default cache directory used by the official RuneLite launcher on Windows.
-	 * <p>
-	 * RuneLite loads the OSRS cache into a per-user directory under
-	 * {@code %USERPROFILE%\.runelite\jagexcache\oldschool\LIVE\}. The provider reads from
-	 * this location; if a user has relocated their cache, the OSRS client itself will
-	 * not start, so this default is correct.
-	 */
-	public static final Path DEFAULT_CACHE_DIRECTORY = Path.of(
-		System.getProperty("user.home"),
-		".runelite",
-		"jagexcache",
-		"oldschool",
-		"LIVE");
-
 	private final JagexCacheReader cache;
 	private final OsrsLanguageArchive archiveParser = new OsrsLanguageArchive();
 
@@ -76,13 +62,27 @@ public class OsrsCacheTranslationProvider implements TranslationProvider
 
 	public OsrsCacheTranslationProvider(Plugin plugin)
 	{
-		this(plugin, DEFAULT_CACHE_DIRECTORY);
+		this(plugin, getDefaultCacheDirectory(plugin));
 	}
 
 	public OsrsCacheTranslationProvider(Plugin plugin, Path cacheDirectory)
 	{
 		this.plugin = plugin;
 		this.cache = new JagexCacheReader(cacheDirectory, JagexCacheReader.LANGUAGE_INDEX);
+	}
+
+	/**
+	 * Gets the default OSRS cache directory from the RuneLite launcher.
+	 */
+	private static Path getDefaultCacheDirectory(Plugin plugin)
+	{
+		// RuneLite loads the OSRS cache into a per-user directory under
+		// %USERPROFILE%\.runelite\jagexcache\oldschool\LIVE\
+		return Paths.get(System.getProperty("user.home"))
+			.resolve(".runelite")
+			.resolve("jagexcache")
+			.resolve("oldschool")
+			.resolve("LIVE");
 	}
 
 	@Override

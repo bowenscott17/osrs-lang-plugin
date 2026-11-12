@@ -127,27 +127,6 @@ public class DialogueReader
 		{
 			text = client.getWidget(291, 1);
 		}
-		if (text == null || text.isHidden())
-		{
-			// Fallback: try the old InterfaceID constant if it exists
-			try
-			{
-				java.lang.reflect.Field field = net.runelite.api.gameval.InterfaceID.class.getField("QuestReward");
-				if (field != null)
-				{
-					Object questReward = field.get(null);
-					java.lang.reflect.Field textField = questReward.getClass().getField("TEXT");
-					if (textField != null)
-					{
-						int textId = textField.getInt(null);
-						text = client.getWidget(291, textId);
-					}
-				}
-			}
-			catch (ReflectiveOperationException ignored)
-			{
-			}
-		}
 
 		if (text == null || text.isHidden())
 		{

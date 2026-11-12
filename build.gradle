@@ -19,13 +19,22 @@ def pluginMainClass = 'com.osrslang.OsrsLangPluginTest'
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
-	compileOnly 'org.projectlombok:lombok:1.18.30'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	compileOnly 'org.projectlombok:lombok:1.18.42'
+	annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+}
+
+sourceSets {
+	main {
+		resources {
+			srcDirs = ['src/main/resources']
+			includes = ['runelite-plugin.properties', 'dictionary/**', 'interface-strings/**', 'osrs-translations/**']
+		}
+	}
 }
 
 group = 'com.osrslang'
@@ -39,7 +48,14 @@ tasks.register('run', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = pluginMainClass
 
-	jvmArgs "-ea"
+	// RuneLite's ReflectUtil walks annotations on JDK internals (java.lang.reflect.Executable
+	// in particular) when it boots. JDK 17+ blocks that unless the target module is opened
+	// to the unnamed module; without these flags the dev client crashes before the UI
+	// appears, with exit code 0xC0000005.
+	jvmArgs "-ea",
+		"--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+		"--add-opens=java.base/java.lang=ALL-UNNAMED",
+		"--add-opens=java.base/java.util=ALL-UNNAMED"
 	args "--developer-mode", "--debug"
 }
 

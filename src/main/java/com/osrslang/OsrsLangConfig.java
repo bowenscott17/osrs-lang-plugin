@@ -191,22 +191,10 @@ public interface OsrsLangConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "translateQuestHelper",
-		name = "Translate Quest Helper plugin",
-		description = "Translate the Zoinkwiz Quest Helper sidebar panel text and in-game overlay text. Requires the Quest Helper plugin to be installed and enabled.",
-		position = 21,
-		section = displaySection
-	)
-	default boolean translateQuestHelper()
-	{
-		return true;
-	}
-
-	@ConfigItem(
 		keyName = "recordUntranslatedInterfaceText",
 		name = "Record untranslated interface text",
 		description = "Log each label the game draws that has no bundled translation, so the translation table can be extended with the words the game really uses",
-		position = 20,
+		position = 21,
 		section = displaySection
 	)
 	default boolean recordUntranslatedInterfaceText()
@@ -218,7 +206,7 @@ public interface OsrsLangConfig extends Config
 		keyName = "fontSize",
 		name = "Font size",
 		description = "Size of the translation text",
-		position = 21,
+		position = 22,
 		section = displaySection
 	)
 	default int fontSize()

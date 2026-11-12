@@ -107,9 +107,7 @@ public class OsrsTranslationDatabaseProvider implements TranslationProvider
 				return;
 			}
 
-			Type type = new TypeToken<Database>()
-			{
-			}.getType();
+			Type type = new TypeToken<Database>(){}.getType();
 
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{

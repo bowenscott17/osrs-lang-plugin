@@ -514,9 +514,7 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 
 		try
 		{
-			Type type = new TypeToken<List<LanguageInfo>>()
-			{
-			}.getType();
+			Type type = new TypeToken<List<LanguageInfo>>(){}.getType();
 
 			List<LanguageInfo> parsed = gson.fromJson(json, type);
 			if (parsed == null)

@@ -221,39 +221,37 @@ public class GermanNounDatabase
 			return Collections.emptyMap();
 		}
 
-			Type type = new TypeToken<Map<String, String>>()
+		Type type = new TypeToken<Map<String, String>>(){}.getType();
+
+		try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
+		{
+			Map<String, String> parsed = gson.fromJson(reader, type);
+			if (parsed == null)
 			{
-			}.getType();
-
-			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
-			{
-				Map<String, String> parsed = gson.fromJson(reader, type);
-				if (parsed == null)
-				{
-					return Collections.emptyMap();
-				}
-
-				Map<String, String> byNoun = new HashMap<>();
-				for (Map.Entry<String, String> entry : parsed.entrySet())
-				{
-					if (entry.getKey() == null || entry.getValue() == null)
-					{
-						continue;
-					}
-
-					String article = entry.getValue().trim().toLowerCase(Locale.ROOT);
-					if (TranslationResult.MASCULINE_ARTICLE.equals(article)
-						|| TranslationResult.FEMININE_ARTICLE.equals(article)
-						|| TranslationResult.NEUTER_ARTICLE.equals(article))
-					{
-						byNoun.put(norm(entry.getKey()), article);
-					}
-				}
-
-				log.debug("Loaded {} German nouns for article lookup", byNoun.size());
-			log.info("German noun table loaded successfully with {} entries", byNoun.size());
-				return Collections.unmodifiableMap(byNoun);
+				return Collections.emptyMap();
 			}
+
+			Map<String, String> byNoun = new HashMap<>();
+			for (Map.Entry<String, String> entry : parsed.entrySet())
+			{
+				if (entry.getKey() == null || entry.getValue() == null)
+				{
+					continue;
+				}
+
+				String article = entry.getValue().trim().toLowerCase(Locale.ROOT);
+				if (TranslationResult.MASCULINE_ARTICLE.equals(article)
+					|| TranslationResult.FEMININE_ARTICLE.equals(article)
+					|| TranslationResult.NEUTER_ARTICLE.equals(article))
+				{
+					byNoun.put(norm(entry.getKey()), article);
+				}
+			}
+
+			log.debug("Loaded {} German nouns for article lookup", byNoun.size());
+			log.info("German noun table loaded successfully with {} entries", byNoun.size());
+			return Collections.unmodifiableMap(byNoun);
+		}
 		catch (IOException | RuntimeException e)
 		{
 			log.warn("Failed to load German noun table", e);

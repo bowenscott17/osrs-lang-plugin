@@ -41,6 +41,11 @@ public class JsonTranslationCache implements TranslationCache
 		String source;
 	}
 
+	/**
+	 * Type token for the cache map structure.
+	 */
+	private static final Type CACHE_TYPE = new TypeToken<Map<String, Map<String, CacheEntry>>>(){}.getType();
+
 	private final Gson gson;
 	private final Filepath file;
 	private final int maxEntries;
@@ -86,11 +91,7 @@ public class JsonTranslationCache implements TranslationCache
 
 			try (Reader reader = file.openReader())
 			{
-				Type type = new TypeToken<Map<String, Map<String, CacheEntry>>>()
-				{
-				}.getType();
-
-				Map<String, Map<String, CacheEntry>> loaded = gson.fromJson(reader, type);
+				Map<String, Map<String, CacheEntry>> loaded = gson.fromJson(reader, CACHE_TYPE);
 				if (loaded != null)
 				{
 					entries.putAll(loaded);

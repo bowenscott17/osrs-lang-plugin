@@ -74,9 +74,7 @@ public class InterfaceStringDatabase
 				return;
 			}
 
-			Type type = new TypeToken<Map<String, String>>()
-			{
-			}.getType();
+			Type type = new TypeToken<Map<String, String>>(){}.getType();
 
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{

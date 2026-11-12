@@ -98,9 +98,7 @@ public class LocalDictionaryProvider implements TranslationProvider
 				return;
 			}
 
-			Type type = new TypeToken<Map<String, DictionaryEntry>>()
-			{
-			}.getType();
+			Type type = new TypeToken<Map<String, DictionaryEntry>>(){}.getType();
 
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{

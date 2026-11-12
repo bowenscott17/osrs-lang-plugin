@@ -1,11 +1,10 @@
 package com.osrslang.translation.provider;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +103,7 @@ public class JagexCacheReader
 	 */
 	public boolean isAvailable()
 	{
-		return Files.isRegularFile(indexFile) && Files.isRegularFile(dataFile);
+		return java.nio.file.Files.exists(indexFile) && java.nio.file.Files.exists(dataFile);
 	}
 
 	/**
@@ -120,24 +119,36 @@ public class JagexCacheReader
 		if (!isAvailable())
 		{
 			log.debug("OSRS cache not available at {} (idx exists={}, dat exists={})",
-				indexFile.toFile().getParentFile(),
-				Files.isRegularFile(indexFile),
-				Files.isRegularFile(dataFile));
+				indexFile.getParent(),
+				java.nio.file.Files.exists(indexFile),
+				java.nio.file.Files.exists(dataFile));
 			return;
 		}
 
 		try
 		{
-			byte[] bytes = Files.readAllBytes(indexFile);
+			// Read the entire index file into memory
+			byte[] bytes = readAllBytes(indexFile);
 			parseIndex(bytes);
 			loaded = true;
 			log.debug("Loaded {} entries from OSRS cache index {}",
-				entries.size(), indexFile.getFileName());
+				entries.size(), indexFile.toString());
 		}
 		catch (IOException | RuntimeException e)
 		{
 			log.warn("Failed to read OSRS cache index {}", indexFile, e);
 			entries.clear();
+		}
+	}
+
+	/**
+	 * Reads all bytes from a Path.
+	 */
+	private byte[] readAllBytes(Path file) throws IOException
+	{
+		try (InputStream in = java.nio.file.Files.newInputStream(file))
+		{
+			return in.readAllBytes();
 		}
 	}
 
@@ -199,7 +210,7 @@ public class JagexCacheReader
 		byte[] sector = new byte[SECTOR_SIZE];
 		byte[] buffer = new byte[entry.size];
 
-		try (RandomAccessFile data = new RandomAccessFile(dataFile.toFile(), "r"))
+		try (InputStream data = java.nio.file.Files.newInputStream(dataFile))
 		{
 			int read = 0;
 			int sectorIndex = entry.sectorOffset;
@@ -207,13 +218,29 @@ public class JagexCacheReader
 			for (int i = 0; i < entry.blockCount; i++)
 			{
 				long fileOffset = (long) sectorIndex * SECTOR_SIZE;
-				if (fileOffset + SECTOR_SIZE > data.length())
+
+				// Skip to the sector position
+				long skipped = 0;
+				while (skipped < fileOffset)
 				{
-					return Optional.empty();
+					long n = data.skip(fileOffset - skipped);
+					if (n <= 0)
+					{
+						return Optional.empty();
+					}
+					skipped += n;
 				}
 
-				data.seek(fileOffset);
-				data.readFully(sector);
+				int bytesRead = 0;
+				while (bytesRead < SECTOR_SIZE)
+				{
+					int n = data.read(sector, bytesRead, SECTOR_SIZE - bytesRead);
+					if (n < 0)
+					{
+						return Optional.empty();
+					}
+					bytesRead += n;
+				}
 
 				int type = readInt(sector, 0) >>> 24 & 0xFF;
 				int thisSectorOffset = readInt(sector, 0) & 0x00FFFFFF;
