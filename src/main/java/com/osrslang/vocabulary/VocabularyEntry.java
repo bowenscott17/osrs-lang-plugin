@@ -32,6 +32,9 @@ public class VocabularyEntry
 	 */
 	private final String language;
 
+	/** Target language of this translation; null for legacy entries until migrated. */
+	private String targetLanguage;
+
 	/**
 	 * Whether the user has marked this word as known.
 	 */
@@ -45,11 +48,18 @@ public class VocabularyEntry
 	public VocabularyEntry(String word, String translation, String contextSentence,
 		String contextTranslation, String language)
 	{
+		this(word, translation, contextSentence, contextTranslation, language, null);
+	}
+
+	public VocabularyEntry(String word, String translation, String contextSentence,
+		String contextTranslation, String language, String targetLanguage)
+	{
 		this.word = word;
 		this.translation = translation;
 		this.contextSentence = contextSentence;
 		this.contextTranslation = contextTranslation;
 		this.language = language;
+		this.targetLanguage = targetLanguage;
 	}
 
 	public String getWord()
@@ -92,6 +102,16 @@ public class VocabularyEntry
 		return language;
 	}
 
+	public String getTargetLanguage()
+	{
+		return targetLanguage;
+	}
+
+	public void setTargetLanguage(String targetLanguage)
+	{
+		this.targetLanguage = targetLanguage;
+	}
+
 	public boolean isKnown()
 	{
 		return known;
@@ -125,13 +145,14 @@ public class VocabularyEntry
 		}
 		VocabularyEntry other = (VocabularyEntry) o;
 		return Objects.equals(word, other.word)
-			&& Objects.equals(language, other.language);
+			&& Objects.equals(language, other.language)
+			&& Objects.equals(targetLanguage, other.targetLanguage);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(word, language);
+		return Objects.hash(word, language, targetLanguage);
 	}
 
 	@Override
