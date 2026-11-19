@@ -4,7 +4,7 @@ import com.osrslang.vocabulary.VocabularyExporter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import javax.inject.Inject;
+import java.util.Locale;
 
 /**
  * {@code !vocab} - manages the user's personal vocabulary.
@@ -14,13 +14,12 @@ import javax.inject.Inject;
 @Slf4j
 public class VocabularyChatCommand
 {
-	@Inject
-	private Client client;
-
+	private final Client client;
 	private final VocabularyExporter vocabularyExporter;
 
-	public VocabularyChatCommand(VocabularyExporter vocabularyExporter)
+	public VocabularyChatCommand(Client client, VocabularyExporter vocabularyExporter)
 	{
+		this.client = client;
 		this.vocabularyExporter = vocabularyExporter;
 	}
 
@@ -44,7 +43,7 @@ public class VocabularyChatCommand
 		}
 
 		String[] parts = arguments.trim().split("\\s+", 2);
-		String subCommand = parts[0].toLowerCase();
+		String subCommand = parts[0].toLowerCase(Locale.ROOT);
 
 		switch (subCommand)
 		{
