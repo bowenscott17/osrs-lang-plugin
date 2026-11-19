@@ -75,6 +75,24 @@ public class VocabularyListTest
 	}
 
 	@Test
+	public void testPersonalVocabularyIsScopedToTargetLanguage()
+	{
+		list.add(new VocabularyEntry("sword", "das Schwert", null, null, "en", "de"));
+		assertTrue(list.lookupWord("sword", "en", "de").isPresent());
+		assertFalse(list.lookupWord("sword", "en", "fr").isPresent());
+	}
+
+	@Test
+	public void testLegacyCsvUsesConfiguredTargetLanguage()
+	{
+		String legacyCsv = "word,translation,language,known,times_seen,context,context_translation\\n"
+			+ "sword,das Schwert,en,false,1,,";
+		assertEquals(1, list.importFromCsv(legacyCsv, "en", "de"));
+		assertTrue(list.lookupWord("sword", "en", "de").isPresent());
+		assertFalse(list.lookupWord("sword", "en", "fr").isPresent());
+	}
+
+	@Test
 	public void testLookupIsCaseInsensitive()
 	{
 		list.add(new VocabularyEntry("Sword", "das Schwert", null, null, "en"));
