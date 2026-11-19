@@ -218,8 +218,8 @@ public class OsrsLangPlugin extends Plugin
 		// Initialize user vocabulary list (persisted to vocabulary.json in plugin directory)
 		// Must be done before registering the UserVocabularyProvider
 		Filepath vocabularyFile = getPluginDirectory().join("vocabulary.json");
-		vocabularyList = new VocabularyList(vocabularyFile, gson);
-		vocabularyExporter = new VocabularyExporter(vocabularyList, this, gson);
+		vocabularyList = new VocabularyList(vocabularyFile, gson, config.targetLanguage());
+		vocabularyExporter = new VocabularyExporter(vocabularyList, this, gson, config.targetLanguage());
 
 		// The verified database is consulted before the generic dictionary, so a
 		// human-checked phrase always wins over a dictionary word.
@@ -296,7 +296,7 @@ public class OsrsLangPlugin extends Plugin
 		languageChatCommand = new LanguageChatCommand(languageSupport);
 
 		// Vocabulary management chat command
-		vocabularyChatCommand = new VocabularyChatCommand(vocabularyExporter);
+		vocabularyChatCommand = new VocabularyChatCommand(client, vocabularyExporter);
 
 		// The interface table is read off the client thread like the dictionaries, so
 		// startup is not held up by parsing it.
