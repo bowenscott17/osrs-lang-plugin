@@ -43,14 +43,14 @@ public class UserVocabularyProvider implements TranslationProvider
 	@Override
 	public boolean supports(Language source, Language target)
 	{
-		return true;
+		return source != target;
 	}
 
 	@Override
 	public int getPriority()
 	{
-		// Priority 50: after verified database (10), before dictionary (100)
-		return 50;
+		// Verified database is 10; personal vocabulary must precede the generic dictionary (50).
+		return 40;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class UserVocabularyProvider implements TranslationProvider
 			return Optional.empty();
 		}
 
-		return vocabularyList.lookupWord(word, from.getCode());
+		return vocabularyList.lookupWord(word, from.getCode(), to.getCode());
 	}
 
 	@Override
