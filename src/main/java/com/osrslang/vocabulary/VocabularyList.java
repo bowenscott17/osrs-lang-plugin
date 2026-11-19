@@ -198,6 +198,10 @@ public class VocabularyList
 	 */
 	public void add(VocabularyEntry entry)
 	{
+		if (entry.getTargetLanguage() == null && defaultTargetLanguage != null)
+		{
+			entry.setTargetLanguage(defaultTargetLanguage);
+		}
 		String key = key(entry.getWord(), entry.getLanguage());
 		VocabularyEntry existing = entries.get(key);
 
