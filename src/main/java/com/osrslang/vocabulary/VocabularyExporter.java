@@ -23,12 +23,19 @@ public class VocabularyExporter
 	private final VocabularyList vocabulary;
 	private final Plugin plugin;
 	private final Gson gson;
+	private final String defaultTargetLanguage;
 
 	public VocabularyExporter(VocabularyList vocabulary, Plugin plugin, Gson gson)
+	{
+		this(vocabulary, plugin, gson, null);
+	}
+
+	public VocabularyExporter(VocabularyList vocabulary, Plugin plugin, Gson gson, String defaultTargetLanguage)
 	{
 		this.vocabulary = vocabulary;
 		this.plugin = plugin;
 		this.gson = gson;
+		this.defaultTargetLanguage = defaultTargetLanguage;
 	}
 
 	/**
@@ -110,7 +117,7 @@ public class VocabularyExporter
 				content.append(buffer, 0, read);
 			}
 
-			int imported = vocabulary.importFromCsv(content.toString(), "en");
+			int imported = vocabulary.importFromCsv(content.toString(), "en", defaultTargetLanguage);
 			if (imported > 0)
 			{
 				log.info("Imported {} vocabulary entries from {}", imported, file);
