@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ public class VocabularyList
 	private final Map<String, VocabularyEntry> entries = new LinkedHashMap<>();
 	private final Gson gson;
 	private final Filepath vocabularyFile;
+	private final String defaultTargetLanguage;
 
 	/**
 	 * Type token for the vocabulary map structure.
@@ -47,8 +49,14 @@ public class VocabularyList
 	 */
 	public VocabularyList(Filepath vocabularyFile, Gson gson)
 	{
+		this(vocabularyFile, gson, null);
+	}
+
+	public VocabularyList(Filepath vocabularyFile, Gson gson, String defaultTargetLanguage)
+	{
 		this.gson = gson;
 		this.vocabularyFile = vocabularyFile;
+		this.defaultTargetLanguage = defaultTargetLanguage;
 		if (vocabularyFile != null)
 		{
 			load();
@@ -80,6 +88,19 @@ public class VocabularyList
 		return Optional.of(providerEntry);
 	}
 
+	/** Looks up a saved word only when its recorded target language matches. */
+	public Optional<com.osrslang.translation.provider.VocabularyEntry> lookupWord(
+		String word, String sourceLanguage, String targetLanguage)
+	{
+		VocabularyEntry entry = entries.get(key(word, sourceLanguage));
+		if (entry == null || entry.getTargetLanguage() == null || targetLanguage == null
+			|| !entry.getTargetLanguage().equalsIgnoreCase(targetLanguage))
+		{
+			return Optional.empty();
+		}
+		return lookupWord(word, sourceLanguage);
+	}
+
 	/**
 	 * Loads the vocabulary from disk. Missing, empty, or malformed files are treated
 	 * as an empty vocabulary without overwriting any existing in-memory entries.
@@ -104,6 +125,15 @@ public class VocabularyList
 			{
 				// Preserve insertion order by putting into LinkedHashMap
 				entries.clear();
+				for (VocabularyEntry entry : loaded.values())
+				{
+					// Older JSON files did not record the target language. Associate them
+					// with the configured target rather than serving them for every target.
+					if (entry != null && entry.getTargetLanguage() == null && defaultTargetLanguage != null)
+					{
+						entry.setTargetLanguage(defaultTargetLanguage);
+					}
+				}
 				entries.putAll(loaded);
 				log.debug("Loaded {} vocabulary entries from {}", entries.size(), vocabularyFile);
 			}
@@ -120,9 +150,8 @@ public class VocabularyList
 	}
 
 	/**
-	 * Saves the vocabulary to disk using a temporary file to avoid locking issues.
-	 * On Windows, the target file is deleted first since Files.move with REPLACE_EXISTING
-	 * doesn't work reliably.
+	 * Saves to a temporary file and replaces the destination without deleting the last
+	 * good copy first. If replacement fails, the existing vocabulary remains intact.
 	 */
 	public void save()
 	{
@@ -137,23 +166,21 @@ public class VocabularyList
 			vocabularyFile.getParent().createDirectories();
 			// Write to a temporary file first
 			Filepath tempFile = vocabularyFile.getParent().createTempFile("vocab-", ".tmp");
-			try (Writer writer = tempFile.openWriter(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
+			try
 			{
-				gson.toJson(entries, writer);
+				try (Writer writer = tempFile.openWriter(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
+				{
+					gson.toJson(entries, writer);
+				}
+				tempFile.moveTo(vocabularyFile, StandardCopyOption.REPLACE_EXISTING);
 			}
-			// On Windows, delete target first since move with REPLACE_EXISTING can fail
-			if (vocabularyFile.exists())
+			finally
 			{
-				try
+				if (tempFile.exists())
 				{
-					vocabularyFile.delete();
-				}
-				catch (IOException e)
-				{
-					log.warn("Failed to delete existing vocabulary file {}", vocabularyFile, e);
+					tempFile.delete();
 				}
 			}
-			tempFile.moveTo(vocabularyFile);
 			log.debug("Saved {} vocabulary entries to {}", entries.size(), vocabularyFile);
 		}
 		catch (IOException e)
@@ -289,7 +316,7 @@ public class VocabularyList
 	public String toCsv()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("word,translation,language,known,times_seen,context,context_translation\n");
+		sb.append("word,translation,language,known,times_seen,context,context_translation,target_language\n");
 
 		for (VocabularyEntry entry : entries.values())
 		{
@@ -299,7 +326,8 @@ public class VocabularyList
 				.append(entry.isKnown()).append(',')
 				.append(entry.getTimesSeen()).append(',')
 				.append(escape(entry.getContextSentence())).append(',')
-				.append(escape(entry.getContextTranslation())).append('\n');
+				.append(escape(entry.getContextTranslation())).append(',')
+				.append(escape(entry.getTargetLanguage())).append('\n');
 		}
 
 		return sb.toString();
@@ -317,6 +345,12 @@ public class VocabularyList
 	 * @return the number of entries successfully imported
 	 */
 	public int importFromCsv(String csv, String language)
+	{
+		return importFromCsv(csv, language, null);
+	}
+
+	/** Imports CSV and assigns the configured target to legacy rows without one. */
+	public int importFromCsv(String csv, String language, String defaultTargetLanguage)
 	{
 		if (csv == null || csv.trim().isEmpty())
 		{
@@ -348,7 +382,7 @@ public class VocabularyList
 				continue;
 			}
 
-			VocabularyEntry entry = parseCsvFields(fields, language);
+			VocabularyEntry entry = parseCsvFields(fields, language, defaultTargetLanguage);
 			if (entry != null)
 			{
 				String key = key(entry.getWord(), entry.getLanguage());
@@ -455,7 +489,7 @@ public class VocabularyList
 	 * Parses CSV fields into a VocabularyEntry.
 	 * Expected format: word,translation,language,known,times_seen,context,context_translation
 	 */
-	private VocabularyEntry parseCsvFields(String[] fields, String defaultLanguage)
+	private VocabularyEntry parseCsvFields(String[] fields, String defaultLanguage, String defaultTargetLanguage)
 	{
 		try
 		{
@@ -472,6 +506,8 @@ public class VocabularyList
 			int timesSeen = fields.length > 4 ? Integer.parseInt(unescape(fields[4])) : 1;
 			String context = fields.length > 5 ? unescape(fields[5]) : "";
 			String contextTranslation = fields.length > 6 ? unescape(fields[6]) : "";
+			String targetLanguage = fields.length > 7 && !fields[7].isEmpty()
+				? unescape(fields[7]) : defaultTargetLanguage;
 
 			if (word == null || word.isEmpty() || translation == null || translation.isEmpty())
 			{
@@ -479,7 +515,7 @@ public class VocabularyList
 				return null;
 			}
 
-			VocabularyEntry entry = new VocabularyEntry(word, translation, context, contextTranslation, lang);
+			VocabularyEntry entry = new VocabularyEntry(word, translation, context, contextTranslation, lang, targetLanguage);
 			entry.setKnown(known);
 			// Set timesSeen directly from CSV (add() increments, but import bypasses add())
 			for (int i = 0; i < timesSeen; i++)
