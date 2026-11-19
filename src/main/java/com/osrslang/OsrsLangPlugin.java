@@ -34,7 +34,11 @@ import com.osrslang.overlay.SpellbookLabelOverlay;
 import com.osrslang.overlay.TranslationOverlay;
 import com.osrslang.overlay.WordTooltipOverlay;
 import com.osrslang.overlay.EntityTooltipOverlay;
+import com.osrslang.vocabulary.VocabularyExporter;
+import com.osrslang.vocabulary.VocabularyList;
+import com.osrslang.translation.provider.UserVocabularyProvider;
 import com.osrslang.text.ChatMessageTranslator;
+import com.osrslang.VocabularyChatCommand;
 import com.osrslang.text.DialogueTracker;
 import com.osrslang.text.DialogueWordTracker;
 import com.osrslang.text.GameText;
@@ -156,6 +160,10 @@ public class OsrsLangPlugin extends Plugin
 	private ChatTranslationOverlay chatTranslationOverlay;
 	private ChatMessageTranslator chatTranslator;
 	private GermanNounDatabase nounDatabase;
+	private VocabularyList vocabularyList;
+	private VocabularyExporter vocabularyExporter;
+	private UserVocabularyProvider userVocabularyProvider;
+	private VocabularyChatCommand vocabularyChatCommand;
 
 	/**
 	 * The entity currently under the mouse, and the translation shown for it.
@@ -207,12 +215,22 @@ public class OsrsLangPlugin extends Plugin
 
 		translationManager = new TranslationManager();
 
+		// Initialize user vocabulary list (persisted to vocabulary.json in plugin directory)
+		// Must be done before registering the UserVocabularyProvider
+		Filepath vocabularyFile = getPluginDirectory().join("vocabulary.json");
+		vocabularyList = new VocabularyList(vocabularyFile, gson);
+		vocabularyExporter = new VocabularyExporter(vocabularyList, this, gson);
+
 		// The verified database is consulted before the generic dictionary, so a
 		// human-checked phrase always wins over a dictionary word.
 		database = new OsrsTranslationDatabaseProvider(this, gson);
 		dictionary = new LocalDictionaryProvider(this, gson);
 		translationManager.register(database);
 		translationManager.register(dictionary);
+
+		// User vocabulary - personal saved words take priority over dictionary entries
+		userVocabularyProvider = new UserVocabularyProvider(vocabularyList, this);
+		translationManager.register(userVocabularyProvider);
 
 		// The OSRS cache provider reads Jagex's own German strings from the local OSRS
 		// client cache. It is consulted after the dictionary because it only has entries
@@ -256,6 +274,7 @@ public class OsrsLangPlugin extends Plugin
 		nounDatabase = new GermanNounDatabase(gson);
 		// Pre-load the noun database so it's ready when hover translations need articles
 		nounDatabase.load(from, to);
+
 		hoverTranslationService = new HoverTranslationService(translationManager, translationExecutor, nounDatabase);
 
 		// Asks the offline service what it can translate, so the language selectors only
@@ -275,6 +294,9 @@ public class OsrsLangPlugin extends Plugin
 		}
 
 		languageChatCommand = new LanguageChatCommand(languageSupport);
+
+		// Vocabulary management chat command
+		vocabularyChatCommand = new VocabularyChatCommand(vocabularyExporter);
 
 		// The interface table is read off the client thread like the dictionaries, so
 		// startup is not held up by parsing it.
@@ -340,6 +362,10 @@ public class OsrsLangPlugin extends Plugin
 		chatCommandManager.registerCommandAsync(languageChatCommand.getTrigger(),
 			(message, arguments) -> languageChatCommand.run());
 
+		// Register vocabulary management command
+		chatCommandManager.registerCommandAsync(vocabularyChatCommand.getTrigger(),
+			(message, arguments) -> vocabularyChatCommand.run(arguments));
+
 		log.info("OSRS Language Helper started");
 	}
 
@@ -350,6 +376,11 @@ public class OsrsLangPlugin extends Plugin
 		{
 			chatCommandManager.unregisterCommand(languageChatCommand.getTrigger());
 			languageChatCommand = null;
+		}
+		if (vocabularyChatCommand != null)
+		{
+			chatCommandManager.unregisterCommand(vocabularyChatCommand.getTrigger());
+			vocabularyChatCommand = null;
 		}
 		if (interfaceText != null)
 		{
@@ -463,6 +494,11 @@ public class OsrsLangPlugin extends Plugin
 		{
 			translationCache.save();
 			translationCache = null;
+		}
+		if (vocabularyList != null)
+		{
+			vocabularyList.save();
+			vocabularyList = null;
 		}
 		dialogueTracker.clear();
 		clearContent();
