@@ -1,12 +1,10 @@
 package com.osrslang.translation.provider;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +49,15 @@ public class LocalDictionaryProvider implements TranslationProvider
 		String gender;
 		String example;
 		String english;
+	}
+
+	/**
+	 * Wrapper class for JSON deserialization of the dictionary map.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
+	 */
+	static class DictionaryMap extends HashMap<String, DictionaryEntry>
+	{
+		// Empty - Gson uses this class directly for type information
 	}
 
 	private final Plugin plugin;
@@ -98,11 +105,9 @@ public class LocalDictionaryProvider implements TranslationProvider
 				return;
 			}
 
-			Type type = new TypeToken<Map<String, DictionaryEntry>>(){}.getType();
-
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{
-				Map<String, DictionaryEntry> parsed = gson.fromJson(reader, type);
+				DictionaryMap parsed = gson.fromJson(reader, DictionaryMap.class);
 				if (parsed != null)
 				{
 					for (Map.Entry<String, DictionaryEntry> e : parsed.entrySet())

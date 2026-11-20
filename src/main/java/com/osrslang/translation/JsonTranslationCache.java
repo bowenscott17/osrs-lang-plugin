@@ -1,11 +1,9 @@
 package com.osrslang.translation;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,9 +40,13 @@ public class JsonTranslationCache implements TranslationCache
 	}
 
 	/**
-	 * Type token for the cache map structure.
+	 * Wrapper class for JSON deserialization of the cache map structure.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
 	 */
-	private static final Type CACHE_TYPE = new TypeToken<Map<String, Map<String, CacheEntry>>>(){}.getType();
+	static class CacheMap extends LinkedHashMap<String, Map<String, CacheEntry>>
+	{
+		// Empty - Gson uses this class directly for type information
+	}
 
 	private final Gson gson;
 	private final Filepath file;
@@ -91,7 +93,7 @@ public class JsonTranslationCache implements TranslationCache
 
 			try (Reader reader = file.openReader())
 			{
-				Map<String, Map<String, CacheEntry>> loaded = gson.fromJson(reader, CACHE_TYPE);
+				CacheMap loaded = gson.fromJson(reader, CacheMap.class);
 				if (loaded != null)
 				{
 					entries.putAll(loaded);

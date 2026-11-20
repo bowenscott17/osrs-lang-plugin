@@ -1,12 +1,10 @@
 package com.osrslang.translation.provider;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +61,15 @@ public class OsrsTranslationDatabaseProvider implements TranslationProvider
 		List<VerifiedEntry> entries = new ArrayList<>();
 	}
 
+	/**
+	 * Wrapper class for JSON deserialization of the database.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
+	 */
+	static class DatabaseWrapper
+	{
+		List<VerifiedEntry> entries = new ArrayList<>();
+	}
+
 	private final Plugin plugin;
 	private final Gson gson;
 
@@ -107,11 +114,9 @@ public class OsrsTranslationDatabaseProvider implements TranslationProvider
 				return;
 			}
 
-			Type type = new TypeToken<Database>(){}.getType();
-
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{
-				Database database = gson.fromJson(reader, type);
+				DatabaseWrapper database = gson.fromJson(reader, DatabaseWrapper.class);
 				if (database != null && database.entries != null)
 				{
 					for (VerifiedEntry entry : database.entries)

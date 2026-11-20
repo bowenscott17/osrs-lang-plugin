@@ -1,12 +1,10 @@
 package com.osrslang.vocabulary;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import net.runelite.client.util.Filepath;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -37,9 +35,13 @@ public class VocabularyList
 	private final String defaultTargetLanguage;
 
 	/**
-	 * Type token for the vocabulary map structure.
+	 * Wrapper class for JSON deserialization of the vocabulary map.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
 	 */
-	private static final Type VOCABULARY_TYPE = new TypeToken<Map<String, VocabularyEntry>>(){}.getType();
+	static class VocabularyMap extends LinkedHashMap<String, VocabularyEntry>
+	{
+		// Empty - Gson uses this class directly for type information
+	}
 
 	/**
 	 * Creates a new vocabulary list backed by a JSON file.
@@ -137,7 +139,7 @@ public class VocabularyList
 
 		try (Reader reader = vocabularyFile.openReader())
 		{
-			Map<String, VocabularyEntry> loaded = gson.fromJson(reader, VOCABULARY_TYPE);
+			VocabularyMap loaded = gson.fromJson(reader, VocabularyMap.class);
 			if (loaded != null && !loaded.isEmpty())
 			{
 				// Preserve insertion order by putting into LinkedHashMap

@@ -61,7 +61,6 @@ import com.osrslang.translation.WordTranslationService;
 import com.osrslang.translation.provider.LocalDictionaryProvider;
 import com.osrslang.translation.provider.OfflineMachineTranslationProvider;
 import com.osrslang.translation.provider.OnlineTranslationProvider;
-import com.osrslang.translation.provider.OsrsCacheTranslationProvider;
 import com.osrslang.translation.provider.OsrsTranslationDatabaseProvider;
 import net.runelite.client.plugins.PluginManager;
 
@@ -139,7 +138,6 @@ public class OsrsLangPlugin extends Plugin
 	private OfflineMachineTranslationProvider offlineProvider;
 	private OsrsTranslationDatabaseProvider database;
 	private LocalDictionaryProvider dictionary;
-	private OsrsCacheTranslationProvider cacheTranslationProvider;
 	private JsonTranslationCache translationCache;
 	private LanguageChatCommand languageChatCommand;
 	private InterfaceStringDatabase interfaceStrings;
@@ -231,13 +229,6 @@ public class OsrsLangPlugin extends Plugin
 		// User vocabulary - personal saved words take priority over dictionary entries
 		userVocabularyProvider = new UserVocabularyProvider(vocabularyList, this);
 		translationManager.register(userVocabularyProvider);
-
-		// The OSRS cache provider reads Jagex's own German strings from the local OSRS
-		// client cache. It is consulted after the dictionary because it only has entries
-		// when the user has launched OSRS in German at least once; when it is empty the
-		// next provider answers instead.
-		cacheTranslationProvider = new OsrsCacheTranslationProvider(this);
-		translationManager.register(cacheTranslationProvider);
 
 		// The offline engine talks to a LibreTranslate service the user runs on their
 		// own machine, so no game text leaves the computer.

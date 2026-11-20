@@ -1,12 +1,10 @@
 package com.osrslang.text;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +54,15 @@ public class GermanNounDatabase
 	 * translator is never asked for an article.
 	 */
 	private volatile Map<String, String> articles = null;
+
+	/**
+	 * Wrapper class for JSON deserialization of the noun table.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
+	 */
+	static class NounMap extends HashMap<String, String>
+	{
+		// Empty - Gson uses this class directly for type information
+	}
 
 	public GermanNounDatabase(Gson gson)
 	{
@@ -221,11 +228,9 @@ public class GermanNounDatabase
 			return Collections.emptyMap();
 		}
 
-		Type type = new TypeToken<Map<String, String>>(){}.getType();
-
 		try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 		{
-			Map<String, String> parsed = gson.fromJson(reader, type);
+			NounMap parsed = gson.fromJson(reader, NounMap.class);
 			if (parsed == null)
 			{
 				return Collections.emptyMap();

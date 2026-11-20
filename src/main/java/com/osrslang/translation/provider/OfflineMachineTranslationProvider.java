@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -500,6 +498,15 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 	}
 
 	/**
+	 * Wrapper class for JSON deserialization of the language list.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
+	 */
+	static class LanguageList extends ArrayList<LanguageInfo>
+	{
+		// Empty - Gson uses this class directly for type information
+	}
+
+	/**
 	 * Parses a {@code /languages} response.
 	 * <p>
 	 * Codes are taken exactly as the service spells them, so codes that are not plain
@@ -514,9 +521,7 @@ public class OfflineMachineTranslationProvider implements TranslationProvider
 
 		try
 		{
-			Type type = new TypeToken<List<LanguageInfo>>(){}.getType();
-
-			List<LanguageInfo> parsed = gson.fromJson(json, type);
+			LanguageList parsed = gson.fromJson(json, LanguageList.class);
 			if (parsed == null)
 			{
 				return Collections.emptyList();

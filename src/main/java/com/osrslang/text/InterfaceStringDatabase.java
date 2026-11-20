@@ -1,12 +1,10 @@
 package com.osrslang.text;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +39,15 @@ public class InterfaceStringDatabase
 	 */
 	private final Map<String, Map<String, String>> tables = new HashMap<>();
 
+	/**
+	 * Wrapper class for JSON deserialization of the interface strings map.
+	 * Replaces TypeToken to avoid java.lang.reflect import.
+	 */
+	static class InterfaceMap extends HashMap<String, String>
+	{
+		// Empty - Gson uses this class directly for type information
+	}
+
 	private final Gson gson;
 
 	public InterfaceStringDatabase(Gson gson)
@@ -74,11 +81,9 @@ public class InterfaceStringDatabase
 				return;
 			}
 
-			Type type = new TypeToken<Map<String, String>>(){}.getType();
-
 			try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
 			{
-				Map<String, String> parsed = gson.fromJson(reader, type);
+				InterfaceMap parsed = gson.fromJson(reader, InterfaceMap.class);
 				if (parsed != null)
 				{
 					for (Map.Entry<String, String> entry : parsed.entrySet())
