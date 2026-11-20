@@ -296,7 +296,7 @@ public class OsrsLangPlugin extends Plugin
 		languageChatCommand = new LanguageChatCommand(languageSupport);
 
 		// Vocabulary management chat command
-		vocabularyChatCommand = new VocabularyChatCommand(client, vocabularyExporter);
+		vocabularyChatCommand = new VocabularyChatCommand(client, clientThread, vocabularyExporter);
 
 		// The interface table is read off the client thread like the dictionaries, so
 		// startup is not held up by parsing it.
