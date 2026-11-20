@@ -66,10 +66,40 @@ public class VocabularyList
 	/**
 	 * Returns the entry as a translation.provider.VocabularyEntry for integration with
 	 * the translation system.
+	 * <p>
+	 * Note: This legacy method does not filter by target language and will return
+	 * the first matching entry regardless of target language. Prefer using
+	 * {@link #lookupWord(String, String, String)} for precise lookups.
 	 */
 	public Optional<com.osrslang.translation.provider.VocabularyEntry> lookupWord(String word, String language)
 	{
-		VocabularyEntry entry = entries.get(key(word, language));
+		// Search for any entry matching word and source language (legacy behavior)
+		for (VocabularyEntry entry : entries.values())
+		{
+			if (entry.getWord().equalsIgnoreCase(word) && entry.getLanguage().equalsIgnoreCase(language))
+			{
+				// Convert to translation.provider.VocabularyEntry
+				com.osrslang.translation.provider.VocabularyEntry providerEntry =
+					new com.osrslang.translation.provider.VocabularyEntry(
+						entry.getWord(),
+						entry.getTranslation(),
+						null, // partOfSpeech
+						null, // dictionaryForm
+						null, // gender
+						entry.getContextSentence(), // example
+						entry.getContextTranslation() // english gloss
+					);
+				return Optional.of(providerEntry);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/** Looks up a saved word only when its recorded target language matches. */
+	public Optional<com.osrslang.translation.provider.VocabularyEntry> lookupWord(
+		String word, String sourceLanguage, String targetLanguage)
+	{
+		VocabularyEntry entry = entries.get(key(word, sourceLanguage, targetLanguage));
 		if (entry == null)
 		{
 			return Optional.empty();
@@ -86,19 +116,6 @@ public class VocabularyList
 				entry.getContextTranslation() // english gloss
 			);
 		return Optional.of(providerEntry);
-	}
-
-	/** Looks up a saved word only when its recorded target language matches. */
-	public Optional<com.osrslang.translation.provider.VocabularyEntry> lookupWord(
-		String word, String sourceLanguage, String targetLanguage)
-	{
-		VocabularyEntry entry = entries.get(key(word, sourceLanguage));
-		if (entry == null || entry.getTargetLanguage() == null || targetLanguage == null
-			|| !entry.getTargetLanguage().equalsIgnoreCase(targetLanguage))
-		{
-			return Optional.empty();
-		}
-		return lookupWord(word, sourceLanguage);
 	}
 
 	/**
@@ -125,16 +142,22 @@ public class VocabularyList
 			{
 				// Preserve insertion order by putting into LinkedHashMap
 				entries.clear();
-				for (VocabularyEntry entry : loaded.values())
+				for (Map.Entry<String, VocabularyEntry> loadedEntry : loaded.entrySet())
 				{
-					// Older JSON files did not record the target language. Associate them
-					// with the configured target rather than serving them for every target.
-					if (entry != null && entry.getTargetLanguage() == null && defaultTargetLanguage != null)
+					VocabularyEntry entry = loadedEntry.getValue();
+					if (entry != null)
 					{
-						entry.setTargetLanguage(defaultTargetLanguage);
+						// Older JSON files did not record the target language. Associate them
+						// with the configured target rather than serving them for every target.
+						if (entry.getTargetLanguage() == null && defaultTargetLanguage != null)
+						{
+							entry.setTargetLanguage(defaultTargetLanguage);
+						}
+						// Re-key using the new three-part key format
+						String newKey = key(entry.getWord(), entry.getLanguage(), entry.getTargetLanguage());
+						entries.put(newKey, entry);
 					}
 				}
-				entries.putAll(loaded);
 				log.debug("Loaded {} vocabulary entries from {}", entries.size(), vocabularyFile);
 			}
 			else
@@ -202,7 +225,7 @@ public class VocabularyList
 		{
 			entry.setTargetLanguage(defaultTargetLanguage);
 		}
-		String key = key(entry.getWord(), entry.getLanguage());
+		String key = key(entry.getWord(), entry.getLanguage(), entry.getTargetLanguage());
 		VocabularyEntry existing = entries.get(key);
 
 		if (existing == null)
@@ -232,26 +255,66 @@ public class VocabularyList
 	}
 
 	/**
-	 * Looks up a saved word.
+	 * Looks up a saved word by word, source language, and target language.
 	 */
-	public Optional<VocabularyEntry> get(String word, String language)
+	public Optional<VocabularyEntry> get(String word, String language, String targetLanguage)
 	{
-		return Optional.ofNullable(entries.get(key(word, language)));
+		return Optional.ofNullable(entries.get(key(word, language, targetLanguage)));
 	}
 
 	/**
-	 * Removes a word.
+	 * Looks up a saved word by word and source language only (legacy).
+	 * <p>
+	 * Note: This method returns the first matching entry regardless of target language.
+	 * If multiple target languages exist for the same word, the result is arbitrary.
+	 * Prefer {@link #get(String, String, String)} for precise lookups.
+	 */
+	public Optional<VocabularyEntry> get(String word, String language)
+	{
+		for (VocabularyEntry entry : entries.values())
+		{
+			if (entry.getWord().equalsIgnoreCase(word) && entry.getLanguage().equalsIgnoreCase(language))
+			{
+				return Optional.of(entry);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Removes a word for a specific source and target language pair.
 	 *
 	 * @return whether the word was present
 	 */
-	public boolean remove(String word, String language)
+	public boolean remove(String word, String language, String targetLanguage)
 	{
-		boolean removed = entries.remove(key(word, language)) != null;
+		boolean removed = entries.remove(key(word, language, targetLanguage)) != null;
 		if (removed)
 		{
 			save();
 		}
 		return removed;
+	}
+
+	/**
+	 * Removes a word by word and source language only (legacy).
+	 * <p>
+	 * Note: This method removes the first matching entry regardless of target language.
+	 * If multiple target languages exist for the same word, the result is arbitrary.
+	 * Prefer {@link #remove(String, String, String)} for precise removal.
+	 */
+	public boolean remove(String word, String language)
+	{
+		for (Map.Entry<String, VocabularyEntry> entry : entries.entrySet())
+		{
+			if (entry.getValue().getWord().equalsIgnoreCase(word) && entry.getValue().getLanguage().equalsIgnoreCase(language))
+			{
+				entries.remove(entry.getKey());
+				save();
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -389,7 +452,7 @@ public class VocabularyList
 			VocabularyEntry entry = parseCsvFields(fields, language, defaultTargetLanguage);
 			if (entry != null)
 			{
-				String key = key(entry.getWord(), entry.getLanguage());
+				String key = key(entry.getWord(), entry.getLanguage(), entry.getTargetLanguage());
 				if (!entries.containsKey(key))
 				{
 					entries.put(key, entry);
@@ -397,7 +460,7 @@ public class VocabularyList
 				}
 				else
 				{
-					log.debug("CSV import: skipping duplicate entry for '{}'", entry.getWord());
+					log.debug("CSV import: skipping duplicate entry for '{}' ({} -> {})", entry.getWord(), entry.getLanguage(), entry.getTargetLanguage());
 				}
 			}
 		}
@@ -566,8 +629,19 @@ public class VocabularyList
 		return '"' + value.replace("\"", "\"\"") + '"';
 	}
 
-	private static String key(String word, String language)
+	private static String key(String word, String language, String targetLanguage)
 	{
-		return (word == null ? "" : word.toLowerCase(Locale.ROOT)) + "|" + (language == null ? "" : language);
+		return (word == null ? "" : word.toLowerCase(Locale.ROOT)) + "|"
+			+ (language == null ? "" : language.toLowerCase(Locale.ROOT)) + "|"
+			+ (targetLanguage == null ? "" : targetLanguage.toLowerCase(Locale.ROOT));
+	}
+
+	/**
+	 * Legacy key for backwards compatibility with existing code that only uses word and source language.
+	 * Uses empty target language to match legacy entries that were saved before target language support.
+	 */
+	private static String legacyKey(String word, String language)
+	{
+		return (word == null ? "" : word.toLowerCase(Locale.ROOT)) + "|" + (language == null ? "" : language.toLowerCase(Locale.ROOT)) + "|";
 	}
 }
