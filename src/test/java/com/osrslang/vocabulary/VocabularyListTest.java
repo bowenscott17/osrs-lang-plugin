@@ -85,7 +85,7 @@ public class VocabularyListTest
 	@Test
 	public void testLegacyCsvUsesConfiguredTargetLanguage()
 	{
-		String legacyCsv = "word,translation,language,known,times_seen,context,context_translation\\n"
+		String legacyCsv = "word,translation,language,known,times_seen,context,context_translation\n"
 			+ "sword,das Schwert,en,false,1,,";
 		assertEquals(1, list.importFromCsv(legacyCsv, "en", "de"));
 		assertTrue(list.lookupWord("sword", "en", "de").isPresent());
