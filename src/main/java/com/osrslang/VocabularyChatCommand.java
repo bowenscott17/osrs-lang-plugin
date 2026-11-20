@@ -4,6 +4,8 @@ import com.osrslang.vocabulary.VocabularyExporter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.client.callback.ClientThread;
+import javax.swing.SwingUtilities;
 import java.util.Locale;
 
 /**
@@ -15,11 +17,13 @@ import java.util.Locale;
 public class VocabularyChatCommand
 {
 	private final Client client;
+	private final ClientThread clientThread;
 	private final VocabularyExporter vocabularyExporter;
 
-	public VocabularyChatCommand(Client client, VocabularyExporter vocabularyExporter)
+	public VocabularyChatCommand(Client client, ClientThread clientThread, VocabularyExporter vocabularyExporter)
 	{
 		this.client = client;
+		this.clientThread = clientThread;
 		this.vocabularyExporter = vocabularyExporter;
 	}
 
@@ -78,33 +82,41 @@ public class VocabularyChatCommand
 
 	private void exportVocabulary()
 	{
-		vocabularyExporter.exportToFile(client);
 		say("Opening file chooser to export vocabulary...");
+		// Filepath.Chooser requires Swing's event-dispatch thread.
+		SwingUtilities.invokeLater(() -> vocabularyExporter.exportToFile(client));
 	}
 
 	private void importVocabulary()
 	{
-		vocabularyExporter.importFromFile(client);
 		say("Opening file chooser to import vocabulary...");
+		// Filepath.Chooser requires Swing's event-dispatch thread.
+		SwingUtilities.invokeLater(() -> vocabularyExporter.importFromFile(client));
 	}
 
 	private void listVocabulary()
 	{
-		int total = vocabularyExporter.getVocabularyList().size();
-		int known = vocabularyExporter.getVocabularyList().getKnown().size();
-		int unknown = vocabularyExporter.getVocabularyList().getUnknown().size();
-
-		say("Vocabulary: " + total + " words (" + known + " known, " + unknown + " learning)");
+		// Read the vocabulary on the client thread, where game-owned state is accessed.
+		clientThread.invokeLater(() -> {
+			int total = vocabularyExporter.getVocabularyList().size();
+			int known = vocabularyExporter.getVocabularyList().getKnown().size();
+			int unknown = vocabularyExporter.getVocabularyList().getUnknown().size();
+			say("Vocabulary: " + total + " words (" + known + " known, " + unknown + " learning)");
+		});
 	}
 
 	private void clearVocabulary()
 	{
-		vocabularyExporter.getVocabularyList().clear();
-		say("Vocabulary cleared.");
+		clientThread.invokeLater(() -> {
+			vocabularyExporter.getVocabularyList().clear();
+			say("Vocabulary cleared.");
+		});
 	}
 
 	private void say(String message)
 	{
-		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "[OSRS Language Helper] ", message);
+		// Chat commands registered with registerCommandAsync run on a worker thread.
+		clientThread.invokeLater(() ->
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "[OSRS Language Helper] ", message));
 	}
 }
