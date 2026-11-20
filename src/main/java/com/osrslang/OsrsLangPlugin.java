@@ -69,7 +69,7 @@ import net.runelite.client.plugins.PluginManager;
 	name = "OSRS Language Helper",
 	description = "Translate OSRS dialogue and game text to help you learn a new language",
 	tags = {"language", "translation", "learning", "education"},
-	internalName = "osrs-lang"
+	internalName = "osrs-language-helper"
 )
 public class OsrsLangPlugin extends Plugin
 {
@@ -330,7 +330,7 @@ public class OsrsLangPlugin extends Plugin
 		refreshGroundItemOverlay();
 
 		// The OSRS client draws its right-click menu with a font that has no German
-		// umlauts in it, so entries like "FÃ¤llen" come out as a placeholder box. The
+		// umlauts in it, so entries like "FÃƒÂ¤llen" come out as a placeholder box. The
 		// plugin could redraw the affected rows on top, but the overlay was disabled
 		// because the redrawn text still showed alongside OSRS's own drawing and read
 		// as a second copy of the menu. Left registered as a field for future
@@ -831,10 +831,10 @@ public class OsrsLangPlugin extends Plugin
         if (isOption && to == Language.GERMAN
             && visibleText.equalsIgnoreCase("Chop down"))
         {
-            applyMenuTranslation(entry, original, "Fällen", true);
+            applyMenuTranslation(entry, original, "FÃ¤llen", true);
             menuTranslationCache.put(
                 from.getCode() + "|" + to.getCode() + "|" + context.name() + "|" + visibleText,
-                "Fällen");
+                "FÃ¤llen");
             return;
         }
 
@@ -1071,7 +1071,7 @@ private void updateInterfaceText()
 		Language to = language(config.targetLanguage(), Language.GERMAN);
 
 		dialogueWords.update(dialogueTracker.getCurrentWidget(), from);
-		wordOverlay.setPairLabel(from.getName() + " → " + to.getName());
+		wordOverlay.setPairLabel(from.getName() + " â†’ " + to.getName());
 
 		WordBox hovered = hoveredWord();
 
